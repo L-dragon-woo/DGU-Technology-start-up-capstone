@@ -11,7 +11,7 @@ defineProps<{
 </script>
 
 <template>
-  <ol class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <ol class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
     <li
       v-for="(step, index) in steps"
       :key="step.title"
