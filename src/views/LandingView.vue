@@ -112,7 +112,7 @@ const solutions = [
           <!-- Desktop CTA -->
           <div class="hidden md:flex items-center gap-3">
             <RouterLink
-              to="/login"
+              to="/dashboard"
               class="px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors"
             >
               로그인
@@ -143,7 +143,7 @@ const solutions = [
             <a href="#contract" class="px-3 py-2 text-gray-600 hover:text-blue-600">안심 계약</a>
             <a href="#contact" class="px-3 py-2 text-gray-600 hover:text-blue-600">문의</a>
             <div class="flex flex-col gap-2 pt-3 border-t border-gray-100">
-              <RouterLink to="/login" class="px-3 py-2 text-gray-700">로그인</RouterLink>
+              <RouterLink to="/dashboard" class="px-3 py-2 text-gray-700">로그인</RouterLink>
               <RouterLink
                 to="/client/request"
                 class="mx-3 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-center font-medium"

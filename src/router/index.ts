@@ -22,6 +22,11 @@ const router = createRouter({
       meta: { title: '역할 선택', layout: 'none' }
     },
     {
+      path: '/login',
+      name: 'login',
+      redirect: '/dashboard'
+    },
+    {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/views/DashboardView.vue'),
