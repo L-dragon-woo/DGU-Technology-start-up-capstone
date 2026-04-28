@@ -29,6 +29,12 @@ const navItems = [
     path: '/disputes/mediation'
   },
   {
+    name: 'transaction-progress',
+    label: '거래 진행',
+    icon: 'progress',
+    path: '/transaction/progress'
+  },
+  {
     name: 'companies',
     label: '기업 디렉토리',
     icon: 'building',
@@ -107,6 +113,10 @@ const isActive = (item: typeof navItems[0]) => {
             <svg v-else-if="item.icon === 'shield'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
               <path d="m9 12 2 2 4-4"/>
+            </svg>
+            <svg v-else-if="item.icon === 'progress'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12h4l3 8 4-16 3 8h4"/>
+              <path d="M5 20h14"/>
             </svg>
             <svg v-else-if="item.icon === 'message'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>

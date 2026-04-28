@@ -26,7 +26,7 @@ const steps = [
 
 function completePayment() {
   console.log('Contract Escrow Payment:', { ...contract })
-  router.push('/dashboard')
+  router.push('/transaction/progress')
 }
 </script>
 
@@ -115,7 +115,7 @@ function completePayment() {
 
           <AppButton type="button" size="lg" full-width @click="completePayment">
             <CheckCircle class="h-6 w-6" />
-            결제 완료하고 대시보드로 이동
+            결제 완료하고 작업 진행으로 이동
           </AppButton>
         </aside>
       </div>

@@ -63,6 +63,18 @@ const router = createRouter({
       meta: { title: '계약 및 에스크로 결제' }
     },
     {
+      path: '/transaction/progress',
+      name: 'transaction-progress',
+      component: () => import('@/views/transaction/TransactionProgressView.vue'),
+      meta: { title: '작업 진행 대시보드' }
+    },
+    {
+      path: '/transaction/review',
+      name: 'transaction-review',
+      component: () => import('@/views/transaction/TransactionReviewView.vue'),
+      meta: { title: '거래 완료 및 리뷰' }
+    },
+    {
       path: '/disputes/mediation',
       name: 'dispute-mediation',
       component: () => import('@/views/dispute/DisputeMediationView.vue'),
