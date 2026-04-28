@@ -146,3 +146,18 @@ export interface FactoryDetail {
   portfolio: FactoryPortfolioItem[]
   reviews: FactoryReview[]
 }
+
+export interface ReceivedQuoteRequest {
+  id: string
+  projectName: string
+  clientName: string
+  processType: string
+  productItem: string
+  quantity: string
+  budgetRange: string
+  desiredDeadline: string
+  requestedAt: string
+  status: 'new' | 'reviewing' | 'quoted'
+  description: string
+  attachments: Attachment[]
+}

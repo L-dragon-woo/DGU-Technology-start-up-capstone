@@ -23,6 +23,12 @@ const navItems = [
     path: '/factory/onboarding'
   },
   {
+    name: 'factory-requests',
+    label: '받은 요청',
+    icon: 'inbox',
+    path: '/factory/requests'
+  },
+  {
     name: 'dispute-mediation',
     label: '분쟁 중재',
     icon: 'shield',
@@ -109,6 +115,10 @@ const isActive = (item: typeof navItems[0]) => {
               <path d="M5 21V8l6 4V8l6 4V3h2v18"/>
               <path d="M9 17h1"/>
               <path d="M14 17h1"/>
+            </svg>
+            <svg v-else-if="item.icon === 'inbox'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 12h-6l-2 3h-4l-2-3H2"/>
+              <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
             </svg>
             <svg v-else-if="item.icon === 'shield'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>

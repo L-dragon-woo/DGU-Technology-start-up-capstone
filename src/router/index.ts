@@ -51,6 +51,18 @@ const router = createRouter({
       meta: { title: '공장 프로필 등록' }
     },
     {
+      path: '/factory/requests',
+      name: 'factory-requests',
+      component: () => import('@/views/factory/ReceivedRequestsView.vue'),
+      meta: { title: '받은 견적 요청' }
+    },
+    {
+      path: '/factory/requests/:id',
+      name: 'factory-request-detail',
+      component: () => import('@/views/factory/RequestQuoteView.vue'),
+      meta: { title: '요청 상세 및 견적 제출' }
+    },
+    {
       path: '/factories/:id',
       name: 'factory-detail',
       component: () => import('@/views/factory/FactoryDetailView.vue'),

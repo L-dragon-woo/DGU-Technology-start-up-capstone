@@ -45,6 +45,10 @@ const getActivityIcon = (type: string) => {
         <h1>안녕하세요, {{ userStore.currentUser?.name }}님</h1>
         <p>{{ userStore.currentUser?.company.name }}의 오늘 활동을 확인하세요.</p>
       </div>
+      <div class="quick-actions">
+        <RouterLink to="/factory/requests" class="quick-action primary">받은 요청 확인</RouterLink>
+        <RouterLink to="/client/request" class="quick-action">견적 요청 등록</RouterLink>
+      </div>
     </header>
 
     <!-- Stats Grid -->
@@ -163,6 +167,10 @@ const getActivityIcon = (type: string) => {
 
 .page-header {
   margin-bottom: 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .welcome h1 {
@@ -175,6 +183,32 @@ const getActivityIcon = (type: string) => {
 .welcome p {
   font-size: 16px;
   color: var(--text-secondary);
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quick-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.quick-action.primary {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
 }
 
 .stats-grid {
@@ -371,6 +405,11 @@ const getActivityIcon = (type: string) => {
 }
 
 @media (max-width: 1024px) {
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
