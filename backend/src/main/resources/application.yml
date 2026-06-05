@@ -36,7 +36,7 @@ spring:
       on-profile: local
 
   datasource:
-    url: jdbc:h2:mem:dgu_backend;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    url: jdbc:h2:file:./data/dgu_backend;MODE=MySQL;DATABASE_TO_LOWER=TRUE;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -51,6 +51,9 @@ spring:
       ddl-auto: update
     show-sql: true
 
+openai:
+  api-key: ${OPENAI_API_KEY}
+
 ---
 spring:
   config:
@@ -58,12 +61,15 @@ spring:
       on-profile: prod
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://localhost:3306/dgu_backend?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
+
+openai:
+  api-key: ${OPENAI_API_KEY}
