@@ -1,0 +1,4 @@
+INSERT INTO FACTORY (CERT_NO, NAME, CEO, INDUSTRY, CORE_SKILL, REGION) VALUES ('251105-0254', '주식회사 와이씨에프', '김주철', '금속단조제품 제조업', '롤 포밍(Roll forming) 기술', '경남');
+INSERT INTO FACTORY (CERT_NO, NAME, CEO, INDUSTRY, CORE_SKILL, REGION) VALUES ('250704-0201', '(주)인성다이아몬드', '이상돈', '도금업', '4대 중금속 무사용 도금기술', '인천');
+INSERT INTO FACTORY (CERT_NO, NAME, CEO, INDUSTRY, CORE_SKILL, REGION) VALUES ('251101-0253', '알이에스 주식회사', '장준영', '강주물 주조업', '복잡형상 일체화 주조기술', '경남');
+INSERT INTO FACTORY (CERT_NO, NAME, CEO, INDUSTRY, CORE_SKILL, REGION) VALUES ('250704-0200', '에이티솔루션 주식회사', '김진관', '도장 및 기타 피막처리업', '기능성 도료 기반 표면처리 기술', '인천');

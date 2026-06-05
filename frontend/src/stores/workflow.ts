@@ -125,6 +125,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
   }
 
   async function runAIMatching() {
+    if (isMatching.value) return
     isMatching.value = true
     matchingError.value = null
     try {
