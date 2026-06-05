@@ -225,6 +225,10 @@ recording-*.mov
 recording-*.webm
 recordings/
 
+# Local design scratch / mockup PNGs at repo root
+# (production brand assets live under apps/web/public/brand/ with underscore names)
+/rootmatch-*.png
+
 # Additional AI tool state
 .opencode/
 .opencode-*/

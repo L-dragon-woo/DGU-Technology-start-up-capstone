@@ -3,7 +3,7 @@
 import { Bell, Building2, Mail, Sparkles } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type { Notification, NotificationType } from '@rootmatching/shared'
-import { cn } from '@/lib/cn'
+import { cn } from '@/lib/utils'
 import { useNotificationsDispatch, useSortedNotifications } from '@/state/NotificationsContext'
 
 interface NotificationDropdownProps {
@@ -35,58 +35,68 @@ export function NotificationDropdown({ open, onClose, className }: NotificationD
   }
 
   return (
-    <div
-      className={cn(
-        'absolute right-0 top-full z-40 mt-2 w-96 rounded-2xl border border-border bg-white shadow-lg',
-        className,
-      )}
-    >
-      <div className="flex items-center justify-between border-b border-border px-5 py-4">
-        <h2 className="text-lg font-bold text-ink-950">알림</h2>
-        <button
-          type="button"
-          onClick={() => dispatch({ type: 'notifications/markAllAsRead' })}
-          className="text-sm font-bold text-brand transition hover:text-brand-hover"
-        >
-          전체 읽음
-        </button>
-      </div>
-
-      {notifications.length === 0 ? (
-        <div className="px-5 py-10 text-center text-sm font-semibold text-ink-400">
-          새 알림이 없습니다
+    <>
+      <button
+        type="button"
+        aria-label="알림 닫기"
+        className="fixed inset-0 z-30 cursor-default"
+        onClick={onClose}
+      />
+      <div
+        className={cn(
+          'absolute right-0 top-full z-40 mt-2 w-[min(360px,calc(100vw-32px))] rounded-xl border border-border bg-popover text-popover-foreground shadow-ct-popover',
+          className,
+        )}
+        role="dialog"
+        aria-label="알림 목록"
+      >
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <h2 className="text-[15px] font-bold text-foreground">알림</h2>
+          <button
+            type="button"
+            onClick={() => dispatch({ type: 'notifications/markAllAsRead' })}
+            className="text-[15px] font-semibold text-primary transition hover:text-primary/80"
+          >
+            전체 읽음
+          </button>
         </div>
-      ) : (
-        <ul className="max-h-96 overflow-y-auto p-2">
-          {notifications.map((notification) => {
-            const Icon = iconStyles[notification.type]
-            return (
-              <li key={notification.id}>
-                <button
-                  type="button"
-                  onClick={() => clickNotification(notification)}
-                  className={cn(
-                    'flex w-full items-start gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-surface-muted',
-                    notification.isRead
-                      ? 'text-ink-400'
-                      : 'bg-brand-light/30 font-bold text-ink-950',
-                  )}
-                >
-                  <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-brand ring-1 ring-border">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-sm">{notification.title}</span>
-                    <span className="mt-1 block text-xs leading-5 text-ink-700">
-                      {notification.content}
+
+        {notifications.length === 0 ? (
+          <div className="px-4 py-8 text-center text-[15px] font-medium text-muted-foreground">
+            새 알림이 없습니다
+          </div>
+        ) : (
+          <ul className="max-h-[400px] overflow-y-auto p-1.5">
+            {notifications.map((notification) => {
+              const Icon = iconStyles[notification.type]
+              return (
+                <li key={notification.id}>
+                  <button
+                    type="button"
+                    onClick={() => clickNotification(notification)}
+                    className={cn(
+                      'flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2.5 text-left transition hover:bg-muted',
+                      notification.isRead
+                        ? 'text-muted-foreground'
+                        : 'bg-accent/40 font-semibold text-foreground',
+                    )}
+                  >
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-card text-primary ring-1 ring-border">
+                      <Icon className="h-4 w-4" />
                     </span>
-                  </span>
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      )}
-    </div>
+                    <span className="min-w-0">
+                      <span className="text-kr-pretty block text-[15px]">{notification.title}</span>
+                      <span className="text-kr-pretty mt-0.5 block text-[14px] leading-relaxed text-muted-foreground">
+                        {notification.content}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </div>
+    </>
   )
 }

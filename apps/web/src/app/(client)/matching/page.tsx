@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   Check,
@@ -23,6 +22,20 @@ import type { FactoryRecommendation, QuoteRequestDraft } from '@rootmatching/sha
 import { mockFactoryRecommendations } from '@rootmatching/shared/fixtures/factory-data'
 import { AppBadge } from '@/components/ui/AppBadge'
 import { AppButton } from '@/components/ui/AppButton'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Progress } from '@/components/ui/progress'
+import { Separator } from '@/components/ui/separator'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { cn } from '@/lib/cn'
 import { useDemoMode } from '@/lib/demo-mode'
 
@@ -206,23 +219,23 @@ function FilterSelect({
   onChange: (value: string) => void
 }) {
   return (
-    <label className="relative min-w-[160px] flex-1 sm:flex-none">
-      <span className="mb-1 block text-xs font-medium text-ink-400">{label}</span>
-      <span className="relative block">
-        <select
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-full appearance-none rounded-xl border border-border bg-surface-muted px-3 pr-9 text-sm text-ink-700 outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-light"
-        >
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
+    <div className="min-w-[160px] flex-1 space-y-1.5 sm:flex-none">
+      <span className="text-kr-keep block text-xs font-semibold text-muted-foreground">
+        {label}
       </span>
-    </label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className="h-11 rounded-xl border-border bg-muted text-sm text-foreground shadow-none">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option} value={option} className="text-kr-keep">
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   )
 }
 
@@ -301,6 +314,13 @@ export default function MatchingResultPage() {
     })
   }, [deliveryFilter, factories, processFilter, regionFilter, trustScoreFilter])
 
+  useEffect(() => {
+    if (loadState !== 'ready') return
+    if (!selectedFactory) return
+    if (filteredFactories.some((factory) => factory.id === selectedFactory.id)) return
+    setSelectedFactory(filteredFactories[0] ?? null)
+  }, [filteredFactories, loadState, selectedFactory])
+
   function goToDetail(id: string) {
     router.push(`/factories/${id}`)
   }
@@ -338,12 +358,36 @@ export default function MatchingResultPage() {
 
   if (loadState === 'loading') {
     return (
-      <div className="min-h-screen bg-surface-muted px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto flex min-h-[60vh] max-w-7xl flex-col items-center justify-center gap-6">
-          <div className="h-16 w-16 animate-spin rounded-full border-4 border-brand-light border-t-brand" />
-          <div className="text-center">
-            <h2 className="text-xl font-bold text-ink-950">AI가 최적 공장을 분석 중입니다</h2>
-            <p className="mt-2 text-ink-400">공정·납기·품질·가격을 종합적으로 검토하고 있어요</p>
+      <div className="min-h-screen bg-background px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center">
+          <Card className="w-full border-primary/30 bg-accent/40 shadow-ct-soft">
+            <CardContent className="flex items-center gap-5 p-6 sm:p-8">
+              <div
+                className="size-12 shrink-0 animate-spin rounded-full border-4 border-primary border-t-transparent"
+                aria-hidden="true"
+                role="status"
+                aria-label="AI 매칭 진행 중"
+              />
+              <div className="space-y-1.5">
+                <p className="text-kr-pretty text-[18px] font-bold text-foreground">
+                  AI가 최적 공장을 분석 중입니다
+                </p>
+                <p className="text-kr-pretty text-[15px] text-muted-foreground">
+                  공정·납기·품질·가격을 종합적으로 검토하고 있어요. 5-10초가량 소요됩니다.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <div className="mt-6 grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Card key={i} className="border-border bg-card">
+                <CardContent className="space-y-2 p-4">
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/5" />
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
@@ -352,120 +396,137 @@ export default function MatchingResultPage() {
 
   if (loadState === 'empty') {
     return (
-      <div className="min-h-screen bg-surface-muted px-4 py-8 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-background px-4 py-8 sm:px-6 lg:px-8">
         <div className="mx-auto flex min-h-[60vh] max-w-3xl items-center justify-center">
-          <section className="w-full rounded-2xl border border-border bg-white p-8 text-center shadow-sm sm:p-10">
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-brand-light">
-              <Settings className="h-8 w-8 text-brand" />
-            </div>
-            <h1 className="text-2xl font-bold text-ink-950">최근 매칭 결과가 없습니다</h1>
-            <p className="mt-3 text-base leading-7 text-ink-700">
-              저장된 추천 결과가 없거나 1시간이 지나 만료되었습니다.
-            </p>
-            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-              <AppButton
-                type="button"
-                variant="primary"
-                size="lg"
-                onClick={showExampleRecommendations}
-              >
-                <Sparkles className="h-5 w-5" />
-                예시 추천 보기
-              </AppButton>
-              <Link
-                href="/request?demo=true"
-                className="inline-flex min-h-tap-primary items-center justify-center rounded-xl border border-border bg-white px-5 py-3 text-sm font-bold text-ink-700 transition hover:border-brand-light hover:bg-surface-muted hover:text-brand"
-              >
-                견적 요청부터 시작
-              </Link>
-            </div>
-          </section>
+          <Card className="w-full border-border bg-card text-center shadow-ct-soft">
+            <CardContent className="p-8 sm:p-10">
+              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-brand-light">
+                <Settings className="h-8 w-8 text-brand" />
+              </div>
+              <h1 className="text-kr-pretty text-2xl font-bold text-foreground">
+                최근 매칭 결과가 없습니다
+              </h1>
+              <p className="text-kr-pretty mt-3 text-base leading-7 text-muted-foreground">
+                저장된 추천 결과가 없거나 1시간이 지나 만료되었습니다. 새 견적 요청을 등록하면 AI가
+                적합한 공장을 다시 추천해 드립니다.
+              </p>
+              <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+                <AppButton
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  onClick={() => router.push('/request')}
+                >
+                  <Sparkles className="h-5 w-5" />새 견적 요청 등록
+                </AppButton>
+                {isDemoMode && (
+                  <AppButton
+                    type="button"
+                    variant="secondary"
+                    size="lg"
+                    onClick={showExampleRecommendations}
+                  >
+                    예시 추천 보기
+                  </AppButton>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-surface-muted px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8 rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <AppBadge variant="blue">
-                <Sparkles className="h-4 w-4" />
-                AI 추천 공장
-              </AppBadge>
-              <h1 className="mt-4 text-3xl font-bold tracking-normal text-ink-950 sm:text-4xl">
-                AI 매칭 추천 Top {Math.min(filteredFactories.length, 5)}
-              </h1>
-              <p className="mt-3 max-w-3xl text-lg leading-8 text-ink-700">
-                총 {factories.length}개 공장 매칭 · 평균 매칭 점수 {averageMatchScore.toFixed(1)} ·
-                추천 Top {Math.min(filteredFactories.length, 5)}
-              </p>
+        <Card className="mb-8 overflow-hidden border-border bg-card shadow-ct-soft">
+          <CardHeader className="relative p-6 sm:p-8">
+            <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-brand-light/70 blur-3xl" />
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <AppBadge variant="blue">
+                  <Sparkles className="h-4 w-4" />
+                  AI 추천 공장
+                </AppBadge>
+                <CardTitle className="text-kr-pretty mt-4 text-[24px] font-bold tracking-normal text-foreground sm:text-[28px]">
+                  AI 매칭 결과 {filteredFactories.length}곳
+                </CardTitle>
+                <CardDescription className="text-kr-pretty mt-3 max-w-3xl text-lg leading-8 text-muted-foreground">
+                  총 {factories.length}개 공장 매칭 · 평균 점수 {averageMatchScore.toFixed(1)} ·
+                  점수순 정렬
+                </CardDescription>
+              </div>
+
+              {request && (
+                <dl className="grid min-w-full grid-cols-1 gap-3 rounded-2xl bg-muted p-4 sm:grid-cols-3 lg:min-w-[520px]">
+                  <div>
+                    <dt className="text-kr-keep text-xs font-semibold text-muted-foreground">
+                      프로젝트
+                    </dt>
+                    <dd className="text-kr-pretty mt-1 truncate text-sm font-bold text-foreground">
+                      {request.projectName}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-kr-keep text-xs font-semibold text-muted-foreground">
+                      품목 / 공정
+                    </dt>
+                    <dd className="text-kr-pretty mt-1 truncate text-sm font-bold text-foreground">
+                      {request.productItem} · {request.processType}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-kr-keep text-xs font-semibold text-muted-foreground">
+                      희망 납기
+                    </dt>
+                    <dd className="text-kr-keep mt-1 truncate text-sm font-bold text-foreground">
+                      {request.desiredDeadline}
+                    </dd>
+                  </div>
+                </dl>
+              )}
             </div>
+          </CardHeader>
+        </Card>
 
-            {request && (
-              <dl className="grid min-w-full grid-cols-1 gap-3 rounded-2xl bg-surface-muted p-4 sm:grid-cols-3 lg:min-w-[520px]">
-                <div>
-                  <dt className="text-xs font-semibold text-ink-400">프로젝트</dt>
-                  <dd className="mt-1 truncate text-sm font-bold text-ink-950">
-                    {request.projectName}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold text-ink-400">품목 / 공정</dt>
-                  <dd className="mt-1 truncate text-sm font-bold text-ink-950">
-                    {request.productItem} · {request.processType}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold text-ink-400">희망 납기</dt>
-                  <dd className="mt-1 truncate text-sm font-bold text-ink-950">
-                    {request.desiredDeadline}
-                  </dd>
-                </div>
-              </dl>
-            )}
-          </div>
-        </header>
+        <Card className="mb-6 border-border bg-card shadow-ct-soft">
+          <CardContent className="p-4">
+            <div className="flex flex-wrap gap-4">
+              <FilterSelect
+                label="공정"
+                value={processFilter}
+                options={PROCESS_OPTIONS}
+                onChange={setProcessFilter}
+              />
+              <FilterSelect
+                label="지역"
+                value={regionFilter}
+                options={REGION_OPTIONS}
+                onChange={setRegionFilter}
+              />
+              <FilterSelect
+                label="신뢰 점수"
+                value={trustScoreFilter}
+                options={TRUST_SCORE_OPTIONS}
+                onChange={setTrustScoreFilter}
+              />
 
-        <section className="mb-6 rounded-2xl border border-border bg-white p-4 shadow-sm">
-          <div className="flex flex-wrap gap-4">
-            <FilterSelect
-              label="공정"
-              value={processFilter}
-              options={PROCESS_OPTIONS}
-              onChange={setProcessFilter}
-            />
-            <FilterSelect
-              label="지역"
-              value={regionFilter}
-              options={REGION_OPTIONS}
-              onChange={setRegionFilter}
-            />
-            <FilterSelect
-              label="신뢰 점수"
-              value={trustScoreFilter}
-              options={TRUST_SCORE_OPTIONS}
-              onChange={setTrustScoreFilter}
-            />
-
-            <div className="flex items-end">
-              <label className="flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface-muted px-4 transition hover:border-brand-light hover:bg-brand-light/40">
-                <input
-                  type="checkbox"
-                  checked={deliveryFilter}
-                  onChange={(event) => setDeliveryFilter(event.target.checked)}
-                  className="h-4 w-4 rounded border-border text-brand focus:ring-brand-light"
-                />
-                <span className="text-sm text-ink-700">납기 가능</span>
-              </label>
+              <div className="flex items-end">
+                <label className="flex h-11 cursor-pointer items-center gap-2 rounded-xl border border-border bg-muted px-4 transition hover:border-brand-light hover:bg-brand-light/40">
+                  <Checkbox
+                    checked={deliveryFilter}
+                    onCheckedChange={(checked) => setDeliveryFilter(checked === true)}
+                  />
+                  <span className="text-kr-keep text-sm text-foreground">납기 가능</span>
+                </label>
+              </div>
             </div>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-          <main className="grid grid-cols-1 gap-5 lg:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
+          <main className="grid grid-cols-1 gap-5 xl:grid-cols-2">
             {filteredFactories.map((factory) => {
               const isSelected = selectedFactory?.id === factory.id
               const matchScore = getMatchScore(factory)
@@ -474,202 +535,266 @@ export default function MatchingResultPage() {
               const reasons = factory.aiReasonBullets ?? [factory.aiReason]
 
               return (
-                <article
+                <Card
                   key={factory.id}
                   onClick={() => setSelectedFactory(factory)}
                   className={cn(
-                    'cursor-pointer rounded-2xl border bg-white p-5 shadow-toss-sm transition hover:border-brand-light hover:shadow-toss-md sm:p-6',
-                    isSelected ? 'border-brand shadow-md ring-4 ring-brand-light' : 'border-border',
+                    'cursor-pointer border bg-card shadow-ct-soft transition hover:border-brand-light hover:shadow-ct-card',
+                    isSelected
+                      ? 'border-brand shadow-ct-card ring-4 ring-brand-light'
+                      : 'border-border',
                   )}
                 >
-                  <div className="mb-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-                    <div>
-                      <div className="mb-2 flex flex-wrap items-center gap-3">
-                        <h2 className="text-lg font-bold text-ink-950">{factory.name}</h2>
-                        <AppBadge
-                          variant={getTrustScoreVariant(factory.trustScore)}
-                          className={cn(
-                            'border',
-                            getTrustScoreBorderClass(factory.trustScore),
-                            getTrustScoreTextClass(factory.trustScore),
-                          )}
-                        >
-                          <Trophy className="h-4 w-4" />
-                          신뢰 {factory.trustScore}
-                        </AppBadge>
+                  <CardContent className="p-5 sm:p-6">
+                    <div className="mb-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+                      <div>
+                        <div className="mb-2 flex flex-wrap items-center gap-3">
+                          <h2 className="text-kr-pretty text-lg font-bold text-foreground">
+                            {factory.name}
+                          </h2>
+                          <Badge
+                            variant={
+                              getTrustScoreVariant(factory.trustScore) === 'green'
+                                ? 'success'
+                                : getTrustScoreVariant(factory.trustScore) === 'blue'
+                                  ? 'info'
+                                  : 'warning'
+                            }
+                            className={cn(
+                              'text-kr-keep border',
+                              getTrustScoreBorderClass(factory.trustScore),
+                              getTrustScoreTextClass(factory.trustScore),
+                            )}
+                          >
+                            <Trophy className="h-4 w-4" />
+                            신뢰 {factory.trustScore}
+                          </Badge>
+                        </div>
+                        <p className="text-kr-pretty flex items-center gap-1.5 text-sm text-muted-foreground">
+                          <MapPin className="h-4 w-4" />
+                          {factory.location}
+                        </p>
                       </div>
-                      <p className="flex items-center gap-1.5 text-sm text-ink-400">
-                        <MapPin className="h-4 w-4" />
-                        {factory.location}
+
+                      <div className="flex flex-wrap gap-2">
+                        {factory.processes.map((process) => (
+                          <Badge key={process} variant="slate" className="text-kr-keep">
+                            {process}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mb-4 rounded-2xl border border-brand-light bg-brand-light/40 p-4">
+                      <div className="mb-2 flex items-end justify-between">
+                        <span className="text-kr-keep text-sm font-bold text-brand">
+                          AI 매칭 점수
+                        </span>
+                        <span className="text-3xl font-black tabular-nums text-foreground">
+                          {matchScore}
+                        </span>
+                      </div>
+                      <Progress
+                        value={matchScore}
+                        className="h-3 bg-card ring-1 ring-brand-light"
+                      />
+                      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-brand-light/60 pt-2.5 text-[13px] font-bold text-foreground/85">
+                        <span className="inline-flex items-center gap-1">
+                          <Wallet className="h-3.5 w-3.5 text-warning" />
+                          <span className="tabular-nums">
+                            {formatPrice(factory.estimateMin)} ~ {formatPrice(factory.estimateMax)}
+                          </span>
+                        </span>
+                        <span aria-hidden="true" className="text-muted-foreground">
+                          ·
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className={cn('h-3.5 w-3.5', deliveryTone.text)} />
+                          납기{' '}
+                          <span className={cn('tabular-nums', deliveryTone.text)}>
+                            {factory.deliveryRate}%
+                          </span>
+                        </span>
+                        <span aria-hidden="true" className="text-muted-foreground">
+                          ·
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="h-3.5 w-3.5 text-ink-700" />
+                          <span className="tabular-nums">{factory.distanceKm ?? '-'}km</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <dl className="mb-4 grid grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-success-bg">
+                          <Clock className={cn('h-4 w-4', deliveryTone.text)} />
+                        </div>
+                        <div>
+                          <dt className="text-kr-keep text-xs text-muted-foreground">
+                            납기 준수율
+                          </dt>
+                          <dd className={cn('text-sm font-black', deliveryTone.text)}>
+                            {factory.deliveryRate}%
+                          </dd>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-light">
+                          <RefreshCw className="h-4 w-4 text-brand" />
+                        </div>
+                        <div>
+                          <dt className="text-kr-keep text-xs text-muted-foreground">재거래율</dt>
+                          <dd className="text-sm font-semibold text-foreground">
+                            {factory.reorderRate}% · {factory.reorderCustomerCount ?? '-'}곳
+                          </dd>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface-muted">
+                          <MapPin className="h-4 w-4 text-ink-700" />
+                        </div>
+                        <div>
+                          <dt className="text-kr-keep text-xs text-muted-foreground">거리</dt>
+                          <dd className="text-sm font-semibold text-foreground">
+                            {factory.distanceKm ?? '-'}km
+                          </dd>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface-muted">
+                          <UsersRound className="h-4 w-4 text-ink-700" />
+                        </div>
+                        <div>
+                          <dt className="text-kr-keep text-xs text-muted-foreground">규모</dt>
+                          <dd className="text-sm font-semibold text-foreground">
+                            {factory.employeeCount ?? '-'}명
+                          </dd>
+                        </div>
+                      </div>
+                      <div className="col-span-2 flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50">
+                          <Wallet className="h-4 w-4 text-warning" />
+                        </div>
+                        <div>
+                          <dt className="text-kr-keep text-xs text-muted-foreground">예상 견적</dt>
+                          <dd className="text-sm font-semibold text-foreground">
+                            {formatPrice(factory.estimateMin)} ~ {formatPrice(factory.estimateMax)}
+                          </dd>
+                        </div>
+                      </div>
+                    </dl>
+
+                    <div className="mb-4 flex items-start gap-2 rounded-xl bg-brand-light p-3">
+                      <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-brand" />
+                      <p className="text-kr-pretty text-sm leading-6 text-brand">
+                        {factory.aiReason}
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
-                      {factory.processes.map((process) => (
-                        <AppBadge key={process} variant="slate">
-                          {process}
-                        </AppBadge>
-                      ))}
-                    </div>
-                  </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        setExpandedFactoryId(isExpanded ? null : factory.id)
+                      }}
+                      className="text-kr-keep mb-4 w-full border-brand-light bg-card text-brand hover:bg-brand-light"
+                    >
+                      AI 추천 이유 {isExpanded ? '접기' : '자세히 보기'}
+                      {isExpanded ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </Button>
 
-                  <div className="mb-4 rounded-2xl border border-brand-light bg-brand-light/40 p-4">
-                    <div className="mb-2 flex items-end justify-between">
-                      <span className="text-sm font-bold text-brand">AI 매칭 점수</span>
-                      <span className="text-3xl font-black tabular-nums text-ink-950">
-                        {matchScore}
-                      </span>
-                    </div>
-                    <div className="h-3 overflow-hidden rounded-pill bg-white ring-1 ring-brand-light">
-                      <div
-                        className="h-full rounded-pill bg-brand transition-all duration-700"
-                        style={{ width: `${matchScore}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <dl className="mb-4 grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-success-bg">
-                        <Clock className={cn('h-4 w-4', deliveryTone.text)} />
-                      </div>
-                      <div>
-                        <dt className="text-xs text-ink-400">납기 준수율</dt>
-                        <dd className={cn('text-sm font-black', deliveryTone.text)}>
-                          {factory.deliveryRate}%
-                        </dd>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-light">
-                        <RefreshCw className="h-4 w-4 text-brand" />
-                      </div>
-                      <div>
-                        <dt className="text-xs text-ink-400">재거래율</dt>
-                        <dd className="text-sm font-semibold text-ink-950">
-                          {factory.reorderRate}% · {factory.reorderCustomerCount ?? '-'}곳
-                        </dd>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface-muted">
-                        <MapPin className="h-4 w-4 text-ink-700" />
-                      </div>
-                      <div>
-                        <dt className="text-xs text-ink-400">거리</dt>
-                        <dd className="text-sm font-semibold text-ink-950">
-                          {factory.distanceKm ?? '-'}km
-                        </dd>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface-muted">
-                        <UsersRound className="h-4 w-4 text-ink-700" />
-                      </div>
-                      <div>
-                        <dt className="text-xs text-ink-400">규모</dt>
-                        <dd className="text-sm font-semibold text-ink-950">
-                          {factory.employeeCount ?? '-'}명
-                        </dd>
-                      </div>
-                    </div>
-                    <div className="col-span-2 flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50">
-                        <Wallet className="h-4 w-4 text-warning" />
-                      </div>
-                      <div>
-                        <dt className="text-xs text-ink-400">예상 견적</dt>
-                        <dd className="text-sm font-semibold text-ink-950">
-                          {formatPrice(factory.estimateMin)} ~ {formatPrice(factory.estimateMax)}
-                        </dd>
-                      </div>
-                    </div>
-                  </dl>
-
-                  <div className="mb-4 flex items-start gap-2 rounded-xl bg-brand-light p-3">
-                    <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-brand" />
-                    <p className="text-sm leading-6 text-brand">{factory.aiReason}</p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      setExpandedFactoryId(isExpanded ? null : factory.id)
-                    }}
-                    className="mb-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-brand-light bg-white px-4 py-3 text-sm font-bold text-brand transition hover:bg-brand-light"
-                  >
-                    AI 추천 이유 {isExpanded ? '접기' : '자세히 보기'}
-                    {isExpanded ? (
-                      <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
+                    {isExpanded && (
+                      <ul className="mb-4 space-y-2 rounded-2xl border border-border bg-muted p-4">
+                        {reasons.slice(0, 5).map((reason) => (
+                          <li
+                            key={reason}
+                            className="text-kr-pretty flex gap-2 text-sm leading-6 text-foreground"
+                          >
+                            <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+                            <span>{reason}</span>
+                          </li>
+                        ))}
+                      </ul>
                     )}
-                  </button>
 
-                  {isExpanded && (
-                    <ul className="mb-4 space-y-2 rounded-2xl border border-border bg-surface-muted p-4">
-                      {reasons.slice(0, 5).map((reason) => (
-                        <li key={reason} className="flex gap-2 text-sm leading-6 text-ink-800">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
-                          <span>{reason}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        goToDetail(factory.id)
-                      }}
-                      className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-ink-700 transition hover:border-brand-light hover:bg-surface-muted hover:text-brand"
-                    >
-                      상세 보기
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        requestQuote(factory)
-                      }}
-                      className="flex-1 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand/90 focus:outline-none focus:ring-4 focus:ring-brand-light"
-                    >
-                      견적 요청
-                    </button>
-                  </div>
-                </article>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      {isSelected ? (
+                        <span className="text-kr-keep inline-flex items-center gap-1.5 rounded-full bg-brand-light px-3 py-1.5 text-[13px] font-extrabold text-brand">
+                          <Check className="h-3.5 w-3.5" />
+                          선택됨 — 우측 패널에서 진행
+                        </span>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setSelectedFactory(factory)
+                          }}
+                          className="text-kr-keep"
+                        >
+                          이 공장 선택
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          goToDetail(factory.id)
+                        }}
+                        className="text-kr-keep"
+                      >
+                        상세 보기
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               )
             })}
 
             {filteredFactories.length === 0 && (
-              <section className="rounded-2xl border border-border bg-white p-12 text-center shadow-sm lg:col-span-2 2xl:col-span-3">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-muted">
-                  <Settings className="h-8 w-8 text-ink-400" />
-                </div>
-                <h2 className="mb-2 text-lg font-bold text-ink-950">검색 결과가 없습니다</h2>
-                <p className="text-ink-400">필터 조건을 변경해 보세요.</p>
-              </section>
+              <Card className="border-border bg-card text-center shadow-ct-soft xl:col-span-2">
+                <CardContent className="p-12">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-muted">
+                    <Settings className="h-8 w-8 text-ink-400" />
+                  </div>
+                  <h2 className="text-kr-pretty mb-2 text-lg font-bold text-foreground">
+                    검색 결과가 없습니다
+                  </h2>
+                  <p className="text-kr-pretty text-muted-foreground">필터 조건을 변경해 보세요.</p>
+                </CardContent>
+              </Card>
             )}
           </main>
 
           <aside className="lg:sticky lg:top-8 lg:self-start">
-            <section className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-              <div className="bg-ink-950 px-5 py-4">
-                <h2 className="flex items-center gap-2 font-semibold text-white">
+            <Card className="overflow-hidden border-border bg-card shadow-ct-soft">
+              <CardHeader className="bg-ink-950 px-5 py-4">
+                <CardTitle className="text-kr-keep flex items-center gap-2 font-semibold text-white">
                   <TrendingUp className="h-5 w-5" />
-                  선택한 공장 비교
-                </h2>
-              </div>
+                  선택한 공장 상세
+                </CardTitle>
+              </CardHeader>
 
               {selectedFactory ? (
-                <div className="p-5">
-                  <div className="mb-4 border-b border-border pb-4">
-                    <h3 className="mb-1 font-semibold text-ink-950">{selectedFactory.name}</h3>
-                    <p className="text-sm text-ink-400">{selectedFactory.location}</p>
+                <CardContent className="p-5">
+                  <div className="mb-4 pb-4">
+                    <h3 className="text-kr-pretty mb-1 font-semibold text-foreground">
+                      {selectedFactory.name}
+                    </h3>
+                    <p className="text-kr-pretty text-sm text-muted-foreground">
+                      {selectedFactory.location}
+                    </p>
                   </div>
+                  <Separator className="mb-4" />
 
                   <div className="space-y-4">
                     <ProgressMetric
@@ -692,36 +817,43 @@ export default function MatchingResultPage() {
                     />
                   </div>
 
-                  <div className="mt-6 rounded-xl bg-surface-muted p-4">
+                  <div className="mt-6 rounded-xl bg-muted p-4">
                     <div className="mb-2 flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-brand" />
-                      <span className="text-sm font-semibold text-ink-950">종합 추천 이유</span>
+                      <span className="text-kr-keep text-sm font-semibold text-foreground">
+                        종합 추천 이유
+                      </span>
                     </div>
-                    <p className="text-sm leading-6 text-ink-700">{selectedFactory.aiReason}</p>
+                    <p className="text-kr-pretty text-sm leading-6 text-muted-foreground">
+                      {selectedFactory.aiReason}
+                    </p>
                   </div>
 
-                  <button
+                  <Button
                     type="button"
                     onClick={() => requestQuote()}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-sm font-bold text-white transition hover:bg-brand/90 focus:outline-none focus:ring-4 focus:ring-brand-light"
+                    fullWidth
+                    className="text-kr-keep mt-5"
                   >
-                    <Check className="h-4 w-4" />
-                    견적 제출하고 계약으로 이동
-                  </button>
-                </div>
+                    <Check className="h-4 w-4" />이 공장으로 견적 진행
+                  </Button>
+                  <p className="text-kr-pretty mt-2 text-center text-[13px] text-muted-foreground">
+                    선택 후 계약·에스크로 결제 단계로 넘어갑니다.
+                  </p>
+                </CardContent>
               ) : (
-                <div className="p-8 text-center">
+                <CardContent className="p-8 text-center">
                   <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-surface-muted">
                     <Settings className="h-6 w-6 text-ink-400" />
                   </div>
-                  <p className="text-sm leading-6 text-ink-400">
+                  <p className="text-kr-pretty text-sm leading-6 text-muted-foreground">
                     공장을 선택하면
                     <br />
-                    상세 비교 정보를 확인할 수 있습니다.
+                    상세 정보를 확인할 수 있습니다.
                   </p>
-                </div>
+                </CardContent>
               )}
-            </section>
+            </Card>
           </aside>
         </div>
       </div>

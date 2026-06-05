@@ -23,6 +23,10 @@ import {
   mockFactoryDetails,
 } from '@rootmatching/shared/fixtures/factory-data'
 import { AppBadge } from '@/components/ui/AppBadge'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/cn'
 
 export default function FactoryDetailPage() {
@@ -30,8 +34,8 @@ export default function FactoryDetailPage() {
   const factory = mockFactoryDetails[params.id] ?? mockDefaultFactoryDetail
 
   return (
-    <div className="px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
+    <div className="bg-background">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <Link
           href="/companies"
           className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-ink-700 hover:text-brand"
@@ -40,20 +44,28 @@ export default function FactoryDetailPage() {
           기업 디렉토리로
         </Link>
 
-        <header className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+        <Card className="overflow-hidden border-border bg-card shadow-ct-soft">
           <div className="h-48 w-full overflow-hidden bg-surface-muted">
             <img src={factory.image} alt={factory.name} className="h-full w-full object-cover" />
           </div>
-          <div className="flex flex-col gap-4 p-6 sm:p-8 lg:flex-row lg:items-start lg:justify-between">
+          <CardContent className="flex flex-col gap-4 p-4 sm:p-6 lg:flex-row lg:items-start lg:justify-between lg:p-8">
             <div>
               {factory.verified && (
-                <AppBadge variant="green">
-                  <ShieldCheck className="h-4 w-4" />
-                  인증 공장
-                </AppBadge>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="success" className="text-kr-keep">
+                    <ShieldCheck className="h-4 w-4" />
+                    인증 공장
+                  </Badge>
+                  <AppBadge variant="green">
+                    <ShieldCheck className="h-4 w-4" />
+                    인증 공장
+                  </AppBadge>
+                </div>
               )}
-              <h1 className="mt-4 text-3xl font-bold text-ink-950 sm:text-4xl">{factory.name}</h1>
-              <p className="mt-2 inline-flex items-center gap-2 text-base text-ink-700">
+              <h1 className="text-kr-pretty mt-4 text-[24px] font-bold text-foreground sm:text-[28px]">
+                {factory.name}
+              </h1>
+              <p className="text-kr-keep mt-2 inline-flex items-center gap-2 text-base text-foreground/80">
                 <MapPin className="h-4 w-4 text-ink-400" />
                 {factory.location}
               </p>
@@ -62,15 +74,14 @@ export default function FactoryDetailPage() {
                 {factory.trustScore} / 5.0
               </div>
             </div>
-            <Link
-              href={`/factory/requests/${factory.id}`}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-hover"
-            >
-              견적 요청하기
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </header>
+            <Button asChild>
+              <Link href={`/factory/requests/${factory.id}`}>
+                견적 요청하기
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
 
         <section className="my-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <KpiCard
@@ -95,7 +106,7 @@ export default function FactoryDetailPage() {
           />
         </section>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
           <main className="space-y-6">
             <DetailCard icon={<Factory className="h-5 w-5" />} title="전문 공정">
               <ChipList items={factory.specialty} />
@@ -124,9 +135,13 @@ export default function FactoryDetailPage() {
           </main>
 
           <aside className="space-y-6 lg:sticky lg:top-8 lg:self-start">
-            <section className="rounded-2xl border border-border bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold text-ink-950">빠른 정보</h2>
-              <div className="mt-5 space-y-4">
+            <Card className="border-border bg-card shadow-ct-soft">
+              <CardHeader>
+                <CardTitle className="text-kr-pretty text-[18px] font-bold sm:text-[20px]">
+                  빠른 정보
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <QuickInfo
                   icon={<MapPin className="h-4 w-4" />}
                   label="위치"
@@ -147,79 +162,106 @@ export default function FactoryDetailPage() {
                   label="응답 시간"
                   value={factory.kpi.avgResponseTime}
                 />
-              </div>
-            </section>
+              </CardContent>
+            </Card>
 
-            <section className="rounded-2xl bg-ink-950 p-6 text-white shadow-sm">
-              <ShieldCheck className="h-10 w-10 text-brand-light" />
-              <h2 className="mt-4 text-xl font-bold">이 공장에 견적을 요청해보세요</h2>
-              <p className="mt-2 text-sm leading-6 text-white/70">
-                도면과 수량을 공유하면 생산 가능 여부와 예상 단가를 빠르게 확인할 수 있습니다.
-              </p>
-              <Link
-                href={`/factory/requests/${factory.id}`}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-hover"
-              >
-                견적 요청하기
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </section>
+            <Card className="border-border bg-ink-950 text-white shadow-ct-soft">
+              <CardContent className="p-6">
+                <ShieldCheck className="h-10 w-10 text-brand-light" />
+                <h2 className="text-kr-pretty mt-4 text-[18px] font-bold sm:text-[20px]">
+                  이 공장에 견적을 요청해보세요
+                </h2>
+                <p className="text-kr-pretty mt-2 text-sm leading-6 text-white/70">
+                  도면과 수량을 공유하면 생산 가능 여부와 예상 단가를 빠르게 확인할 수 있습니다.
+                </p>
+                <Separator className="my-4 bg-white/20" />
+                <Button asChild fullWidth className="mt-5">
+                  <Link href={`/factory/requests/${factory.id}`}>
+                    견적 요청하기
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           </aside>
         </div>
 
-        <section className="mt-8 rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-7">
-          <div className="mb-5 flex items-center gap-2">
-            <ImageIcon className="h-5 w-5 text-brand" />
-            <h2 className="text-2xl font-bold text-ink-950">포트폴리오</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {factory.portfolio.map((item) => (
-              <article
-                key={item.id}
-                className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm"
-              >
-                <img src={item.image} alt={item.title} className="h-40 w-full object-cover" />
-                <div className="p-4">
-                  <h3 className="font-bold text-ink-950">{item.title}</h3>
-                  <p className="mt-2 text-sm font-semibold text-brand">{item.process}</p>
-                  <p className="mt-1 text-sm text-ink-400">{item.period}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-8 rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-7">
-          <div className="mb-5 flex items-center gap-2">
-            <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
-            <h2 className="text-2xl font-bold text-ink-950">고객 리뷰</h2>
-          </div>
-
-          {factory.reviews.length > 0 ? (
-            <div className="space-y-4">
-              {factory.reviews.map((review) => (
-                <article key={review.id} className="rounded-2xl bg-surface-muted p-5">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <StarRating value={review.rating} />
-                      <div className="mt-3 flex flex-wrap items-center gap-2">
-                        <h3 className="font-bold text-ink-950">{review.author}</h3>
-                        <span className="text-sm font-semibold text-ink-400">{review.company}</span>
-                      </div>
-                    </div>
-                    <span className="text-sm font-semibold text-ink-400">{review.date}</span>
+        <Card className="mt-8 border-border bg-card shadow-ct-soft">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <ImageIcon className="h-5 w-5 text-brand" />
+              <CardTitle className="text-kr-pretty text-[18px] font-bold sm:text-[20px]">
+                포트폴리오
+              </CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {factory.portfolio.map((item) => (
+                <article
+                  key={item.id}
+                  className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm"
+                >
+                  <img src={item.image} alt={item.title} className="h-40 w-full object-cover" />
+                  <div className="p-4">
+                    <h3 className="text-kr-pretty font-bold text-foreground">{item.title}</h3>
+                    <p className="text-kr-keep mt-2 text-sm font-semibold text-brand">
+                      {item.process}
+                    </p>
+                    <p className="text-kr-keep mt-1 text-sm text-muted-foreground">{item.period}</p>
                   </div>
-                  <p className="mt-4 leading-7 text-ink-700">{review.content}</p>
-                  <p className="mt-3 text-sm font-bold text-brand">{review.product}</p>
                 </article>
               ))}
             </div>
-          ) : (
-            <div className="rounded-2xl bg-surface-muted p-8 text-center text-sm font-semibold text-ink-400">
-              아직 리뷰가 없습니다.
+          </CardContent>
+        </Card>
+
+        <Card className="mt-8 border-border bg-card shadow-ct-soft">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+              <CardTitle className="text-kr-pretty text-[18px] font-bold sm:text-[20px]">
+                고객 리뷰
+              </CardTitle>
             </div>
-          )}
-        </section>
+          </CardHeader>
+          <CardContent>
+            {factory.reviews.length > 0 ? (
+              <div className="space-y-4">
+                {factory.reviews.map((review) => (
+                  <article key={review.id} className="rounded-2xl bg-surface-muted p-5">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <StarRating value={review.rating} />
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <h3 className="text-kr-keep font-bold text-foreground">
+                            {review.author}
+                          </h3>
+                          <span className="text-kr-keep text-sm font-semibold text-muted-foreground">
+                            {review.company}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-kr-keep text-sm font-semibold text-muted-foreground">
+                        {review.date}
+                      </span>
+                    </div>
+                    <p className="text-kr-pretty mt-4 leading-7 text-foreground/80">
+                      {review.content}
+                    </p>
+                    <p className="text-kr-keep mt-3 text-sm font-bold text-brand">
+                      {review.product}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl bg-surface-muted p-8 text-center text-sm font-semibold text-ink-400">
+                아직 리뷰가 없습니다.
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
@@ -235,25 +277,35 @@ function DetailCard({
   children: ReactNode
 }) {
   return (
-    <section className="rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-7">
-      <div className="mb-4 flex items-center gap-2">
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-light text-brand">
-          {icon}
-        </span>
-        <h2 className="text-2xl font-bold text-ink-950">{title}</h2>
-      </div>
-      {children}
-    </section>
+    <Card className="border-border bg-card shadow-ct-soft">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-light text-brand">
+            {icon}
+          </span>
+          <CardTitle className="text-kr-pretty text-[18px] font-bold sm:text-[20px]">
+            {title}
+          </CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
   )
 }
 
 function QuickInfo({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
-    <div className="flex gap-3 rounded-xl bg-surface-muted p-4">
-      <span className="mt-0.5 text-brand">{icon}</span>
-      <div>
-        <p className="text-xs font-bold uppercase tracking-wide text-ink-400">{label}</p>
-        <p className="mt-1 text-sm font-semibold leading-6 text-ink-950">{value}</p>
+    <div className="rounded-lg bg-muted px-4 py-3">
+      <div className="flex gap-3">
+        <span className="mt-0.5 text-brand">{icon}</span>
+        <div>
+          <p className="text-kr-keep text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            {label}
+          </p>
+          <p className="text-kr-pretty mt-1 text-sm font-semibold leading-6 text-foreground">
+            {value}
+          </p>
+        </div>
       </div>
     </div>
   )
@@ -271,21 +323,23 @@ function ChipList({ items }: { items: string[] }) {
 
 function Chip({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full bg-brand-light px-3 py-1.5 text-sm font-semibold text-brand">
+    <Badge variant="info" className="text-kr-keep">
       {children}
-    </span>
+    </Badge>
   )
 }
 
 function KpiCard({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
-      <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand">
-        {icon}
-      </div>
-      <p className="text-sm font-semibold text-ink-400">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-ink-950">{value}</p>
-    </div>
+    <Card className="border-border bg-card shadow-ct-soft">
+      <CardContent className="p-5">
+        <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand">
+          {icon}
+        </div>
+        <p className="text-kr-keep text-sm font-semibold text-muted-foreground">{label}</p>
+        <p className="text-kr-pretty mt-1 text-2xl font-bold text-foreground">{value}</p>
+      </CardContent>
+    </Card>
   )
 }
 

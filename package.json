@@ -19,6 +19,8 @@
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r run typecheck",
     "guard:no-mock-auth": "bash apps/api/scripts/check-no-mock-auth.sh",
+    "guard:no-card-stripes": "bash apps/web/scripts/check-no-card-stripes.sh",
+    "guard:senior-ux": "bash apps/web/scripts/check-senior-ux.sh",
     "prepare": "husky"
   },
   "devDependencies": {

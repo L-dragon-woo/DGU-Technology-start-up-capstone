@@ -13,7 +13,10 @@ import {
   Truck,
 } from 'lucide-react'
 import type { TransactionRole } from '@rootmatching/shared'
-import { transactionCases, transactionStatusStyles } from '@/data/transactionData'
+import { Badge, type BadgeProps } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { transactionCases } from '@/data/transactionData'
 import { cn } from '@/lib/cn'
 
 type RoleFilter = TransactionRole | 'all'
@@ -24,6 +27,13 @@ function getRoleLabel(role: TransactionRole): string {
 
 function getDetailPath(id: string, role: TransactionRole): string {
   return role === 'factory' ? `/transactions/${id}?mode=factory` : `/transactions/${id}`
+}
+
+function getStatusBadgeVariant(statusKey: string): BadgeProps['variant'] {
+  if (statusKey === 'completed') return 'success'
+  if (statusKey === 'inspection') return 'warning'
+  if (statusKey === 'delayed') return 'destructive'
+  return 'info'
 }
 
 export default function TransactionListPage() {
@@ -55,44 +65,49 @@ export default function TransactionListPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-surface-muted px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8 overflow-hidden rounded-2xl border border-brand-light bg-white shadow-sm">
+        <header className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-ct-soft">
           <div className="p-6 sm:p-8">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-light px-4 py-2 text-sm font-semibold text-brand">
+            <div className="text-kr-keep mb-4 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-primary">
               <ShieldCheck className="h-4 w-4" />
               거래 진행 관리
             </div>
-            <h1 className="text-3xl font-bold tracking-normal text-ink-950 sm:text-4xl">
+            <h1 className="text-kr-keep text-[clamp(1.5rem,1.3rem+1vw,2rem)] font-bold tracking-normal text-foreground">
               진행 중인 거래
             </h1>
-            <p className="mt-3 max-w-3xl text-lg leading-8 text-ink-700">
+            <p className="text-kr-pretty mt-3 max-w-3xl text-base leading-8 text-muted-foreground sm:text-lg">
               계약 이후 제작, 납품, 검수 단계에 있는 거래를 한 곳에서 확인합니다.
             </p>
           </div>
         </header>
 
-        <section className="mb-6 rounded-2xl border border-border bg-white p-2 shadow-sm">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            {roleTabs.map((tab) => (
-              <button
-                key={tab.value}
-                type="button"
-                className={cn(
-                  'rounded-xl px-4 py-3 text-sm font-bold transition',
-                  activeRole === tab.value
-                    ? 'bg-brand text-white shadow-sm'
-                    : 'text-ink-700 hover:bg-surface-muted hover:text-ink-950',
-                )}
-                onClick={() => setActiveRole(tab.value)}
-              >
-                {tab.label} {tab.count}
-              </button>
-            ))}
-          </div>
-        </section>
+        <Card className="mb-6 border-border bg-card shadow-ct-soft">
+          <CardContent className="p-3">
+            <div className="flex flex-wrap gap-2">
+              {roleTabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  type="button"
+                  className={cn(
+                    'rounded-pill transition',
+                    activeRole !== tab.value && 'hover:bg-accent',
+                  )}
+                  onClick={() => setActiveRole(tab.value)}
+                >
+                  <Badge
+                    variant={activeRole === tab.value ? 'info' : 'slate'}
+                    className="text-kr-keep pointer-events-none"
+                  >
+                    {tab.label} {tab.count}
+                  </Badge>
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-        <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <SummaryCard
             icon={<Truck className="h-6 w-6 text-brand" />}
             label="진행 중"
@@ -110,93 +125,93 @@ export default function TransactionListPage() {
           />
         </section>
 
-        <section className="space-y-4">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredTransactions.map((item) => (
-            <article
+            <Card
               key={item.id}
-              className="rounded-2xl border border-border bg-white p-5 shadow-sm transition hover:border-brand-light hover:shadow-md sm:p-6"
+              className="border-border bg-card shadow-ct-soft transition hover:border-brand-light hover:shadow-ct-card"
             >
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-bold text-ink-400">{item.id}</span>
-                    <span
-                      className={cn(
-                        'rounded-full px-3 py-1 text-xs font-bold ring-1',
-                        transactionStatusStyles[item.statusKey],
-                      )}
-                    >
-                      {item.status}
-                    </span>
-                    <span
-                      className={cn(
-                        'rounded-full px-3 py-1 text-xs font-bold ring-1',
-                        item.myRole === 'client'
-                          ? 'bg-emerald-50 text-emerald-700 ring-emerald-100'
-                          : 'bg-indigo-50 text-indigo-700 ring-indigo-100',
-                      )}
-                    >
-                      {getRoleLabel(item.myRole)}
-                    </span>
-                  </div>
-
-                  <h2 className="mt-3 text-xl font-bold text-ink-950">{item.projectName}</h2>
-                  <p className="mt-2 text-base text-ink-700">
-                    {item.factory} · {item.amount}
-                  </p>
-
-                  <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
-                    <InfoCell
-                      icon={<CalendarClock className="mt-0.5 h-5 w-5 shrink-0 text-ink-400" />}
-                      label="납기"
-                      value={item.dueDate}
-                    />
-                    <InfoCell
-                      icon={<CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-ink-400" />}
-                      label="다음 조치"
-                      value={item.nextAction}
-                    />
-                    <InfoCell
-                      icon={<Clock className="mt-0.5 h-5 w-5 shrink-0 text-ink-400" />}
-                      label="최근 업데이트"
-                      value={item.updatedAt}
-                    />
-                  </div>
-
-                  <div className="mt-5">
-                    <div className="mb-2 flex items-center justify-between text-sm">
-                      <span className="font-semibold text-ink-700">진행률</span>
-                      <span className="font-bold text-ink-950">{item.progressRate}%</span>
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex h-full flex-col gap-5">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-kr-keep text-[15px] font-bold text-muted-foreground">
+                        {item.id}
+                      </span>
+                      <Badge
+                        variant={getStatusBadgeVariant(item.statusKey)}
+                        className="text-kr-keep"
+                      >
+                        {item.status}
+                      </Badge>
+                      <Badge
+                        variant={item.myRole === 'client' ? 'success' : 'slate'}
+                        className="text-kr-keep"
+                      >
+                        {getRoleLabel(item.myRole)}
+                      </Badge>
                     </div>
-                    <div className="h-2 rounded-full bg-surface-muted">
-                      <div
-                        className="h-2 rounded-full bg-brand"
-                        style={{ width: `${item.progressRate}%` }}
+
+                    <h2 className="text-kr-pretty mt-3 text-[15px] font-bold leading-6 text-foreground sm:text-[16px]">
+                      {item.projectName}
+                    </h2>
+                    <p className="text-kr-pretty mt-2 text-[15px] text-muted-foreground">
+                      {item.factory} · {item.amount}
+                    </p>
+
+                    <div className="mt-5 grid grid-cols-1 gap-3">
+                      <InfoCell
+                        icon={<CalendarClock className="mt-0.5 h-5 w-5 shrink-0 text-ink-400" />}
+                        label="납기"
+                        value={item.dueDate}
+                      />
+                      <InfoCell
+                        icon={<CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-ink-400" />}
+                        label="다음 조치"
+                        value={item.nextAction}
+                      />
+                      <InfoCell
+                        icon={<Clock className="mt-0.5 h-5 w-5 shrink-0 text-ink-400" />}
+                        label="최근 업데이트"
+                        value={item.updatedAt}
                       />
                     </div>
+
+                    <div className="mt-5">
+                      <div className="mb-2 flex items-center justify-between text-sm">
+                        <span className="text-kr-keep font-semibold text-muted-foreground">
+                          진행률
+                        </span>
+                        <span className="font-bold text-foreground">{item.progressRate}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted">
+                        <div
+                          className="h-2 rounded-full bg-brand"
+                          style={{ width: `${item.progressRate}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto flex flex-col gap-2 sm:flex-row">
+                    <Button asChild variant="outline" size="sm" className="text-kr-keep flex-1">
+                      <Link href={getDetailPath(item.id, item.myRole)}>
+                        {item.myRole === 'client' ? '진행 확인' : '상세 보기'}
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    {item.myRole === 'factory' && (
+                      <Button asChild size="sm" className="text-kr-keep flex-1">
+                        <Link href={`/transactions/${item.id}?mode=factory`}>
+                          <PencilLine className="h-4 w-4" />
+                          진행 업데이트
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
-
-                <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-                  <Link
-                    href={getDetailPath(item.id, item.myRole)}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-bold text-ink-700 transition hover:border-brand-light hover:bg-brand-light/40 hover:text-brand"
-                  >
-                    {item.myRole === 'client' ? '진행 확인' : '상세 보기'}
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  {item.myRole === 'factory' && (
-                    <Link
-                      href={`/transactions/${item.id}?mode=factory`}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-hover"
-                    >
-                      <PencilLine className="h-4 w-4" />
-                      진행 업데이트
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </article>
+              </CardContent>
+            </Card>
           ))}
         </section>
       </div>
@@ -206,13 +221,15 @@ export default function TransactionListPage() {
 
 function SummaryCard({ icon, label, value }: { icon: ReactNode; label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+    <Card className="border-border bg-card p-5 shadow-ct-soft">
       <div className="flex items-center gap-3">
         {icon}
-        <span className="text-sm font-semibold text-ink-400">{label}</span>
+        <span className="text-kr-keep text-[15px] font-semibold text-muted-foreground">
+          {label}
+        </span>
       </div>
-      <p className="mt-3 text-3xl font-bold text-ink-950">{value}</p>
-    </div>
+      <p className="mt-3 text-3xl font-bold text-foreground">{value}</p>
+    </Card>
   )
 }
 
@@ -221,8 +238,8 @@ function InfoCell({ icon, label, value }: { icon: ReactNode; label: string; valu
     <div className="flex items-start gap-3 rounded-xl bg-surface-muted p-4">
       {icon}
       <div>
-        <p className="text-xs font-semibold text-ink-400">{label}</p>
-        <p className="mt-1 text-sm font-bold text-ink-950">{value}</p>
+        <p className="text-kr-keep text-xs font-semibold text-muted-foreground">{label}</p>
+        <p className="text-kr-pretty mt-1 text-sm font-bold text-foreground">{value}</p>
       </div>
     </div>
   )

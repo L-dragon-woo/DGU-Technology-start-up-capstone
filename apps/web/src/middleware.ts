@@ -27,5 +27,10 @@ export function middleware(req: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  /**
+   * `brand/`, `icon.png`, `apple-icon.png`는 `apps/web/public/` 및 Next file-convention asset.
+   * 인증 redirect에 잡히면 next/image가 PNG fetch 실패 → broken image 렌더링됨.
+   * (Logo 컴포넌트가 사용하는 /brand/rootmatch_*.png가 대표적인 영향 경로.)
+   */
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|brand|icon\\.png|apple-icon\\.png).*)'],
 }

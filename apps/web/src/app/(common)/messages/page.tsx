@@ -6,6 +6,11 @@ import { useSearchParams } from 'next/navigation'
 import type { Message } from '@rootmatching/shared'
 import { AppBadge } from '@/components/ui/AppBadge'
 import { AppButton } from '@/components/ui/AppButton'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/cn'
 import { useMessagesDispatch, useMessagesState, useSortedMessages } from '@/state/MessagesContext'
 import { useUserState } from '@/state/UserContext'
@@ -86,56 +91,68 @@ function MessagesPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-muted px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8 overflow-hidden rounded-2xl border border-brand-light bg-white shadow-sm">
+        <header className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-ct-soft">
           <div className="p-6 sm:p-8">
             <AppBadge variant="blue" className="mb-4 px-4 py-2 text-sm font-semibold">
               <Mail className="h-4 w-4" />
               메시지
             </AppBadge>
-            <h1 className="text-3xl font-bold tracking-normal text-ink-950 sm:text-4xl">메시지</h1>
-            <p className="mt-3 max-w-3xl text-lg leading-8 text-ink-700">
+            <h1 className="text-kr-keep text-[clamp(1.5rem,1.3rem+1vw,2rem)] font-bold tracking-normal text-foreground">
+              메시지
+            </h1>
+            <p className="text-kr-pretty mt-3 max-w-3xl text-base leading-8 text-muted-foreground sm:text-lg">
               수신/발신 메시지를 한 곳에서 확인하세요.
             </p>
           </div>
         </header>
 
-        <section className="mb-6 rounded-2xl border border-border bg-white p-2 shadow-sm">
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setActiveFilter('all')}
-              className={cn(
-                'rounded-xl px-4 py-3 text-sm font-bold transition',
-                activeFilter === 'all'
-                  ? 'bg-brand-light text-brand'
-                  : 'text-ink-700 hover:bg-surface-muted hover:text-brand',
-              )}
-            >
-              전체 ({sortedMessages.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveFilter('unread')}
-              className={cn(
-                'rounded-xl px-4 py-3 text-sm font-bold transition',
-                activeFilter === 'unread'
-                  ? 'bg-brand-light text-brand'
-                  : 'text-ink-700 hover:bg-surface-muted hover:text-brand',
-              )}
-            >
-              읽지 않음 ({unreadCount})
-            </button>
-          </div>
-        </section>
+        <Card className="mb-6 border-border bg-card shadow-ct-soft">
+          <CardContent className="p-3">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveFilter('all')}
+                className={cn(
+                  'rounded-pill transition',
+                  activeFilter !== 'all' && 'hover:bg-accent',
+                )}
+              >
+                <Badge
+                  variant={activeFilter === 'all' ? 'info' : 'slate'}
+                  className="text-kr-keep pointer-events-none"
+                >
+                  전체 ({sortedMessages.length})
+                </Badge>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveFilter('unread')}
+                className={cn(
+                  'rounded-pill transition',
+                  activeFilter !== 'unread' && 'hover:bg-accent',
+                )}
+              >
+                <Badge
+                  variant={activeFilter === 'unread' ? 'info' : 'slate'}
+                  className="text-kr-keep pointer-events-none"
+                >
+                  읽지 않음 ({unreadCount})
+                </Badge>
+              </button>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="grid min-h-[600px] grid-cols-1 gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
-          <aside className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-border bg-surface-muted px-5 py-4">
+        <div className="grid min-h-[600px] grid-cols-1 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <Card className="overflow-hidden border-border bg-card shadow-ct-soft">
+            <div className="flex items-center justify-between border-b border-border bg-muted px-5 py-4">
               <div>
-                <p className="text-sm font-semibold text-ink-400">메시지함</p>
-                <p className="mt-1 text-lg font-bold text-ink-950">{visibleMessages.length}개</p>
+                <p className="text-kr-keep text-sm font-semibold text-muted-foreground">메시지함</p>
+                <p className="text-kr-keep mt-1 text-lg font-bold text-foreground">
+                  {visibleMessages.length}개
+                </p>
               </div>
               <AppButton
                 variant="secondary"
@@ -156,8 +173,8 @@ function MessagesPageContent() {
                       type="button"
                       onClick={() => selectMessage(message)}
                       className={cn(
-                        'block w-full border-l-4 border-transparent px-5 py-4 text-left transition hover:bg-surface-muted',
-                        isSelected && 'border-brand bg-brand-light/30',
+                        'block w-full px-5 py-4 text-left transition hover:bg-muted',
+                        isSelected && 'bg-accent',
                       )}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -168,7 +185,7 @@ function MessagesPageContent() {
                             )}
                             <p
                               className={cn(
-                                'truncate text-sm text-ink-950',
+                                'text-kr-keep truncate text-sm text-foreground',
                                 message.isRead ? 'font-semibold' : 'font-extrabold',
                               )}
                             >
@@ -177,7 +194,7 @@ function MessagesPageContent() {
                           </div>
                           <p
                             className={cn(
-                              'mt-2 line-clamp-1 text-base text-ink-950',
+                              'text-kr-pretty mt-2 line-clamp-1 text-base text-foreground',
                               message.isRead ? 'font-semibold' : 'font-extrabold',
                             )}
                           >
@@ -185,14 +202,16 @@ function MessagesPageContent() {
                           </p>
                           <p
                             className={cn(
-                              'mt-1 line-clamp-1 text-sm',
-                              message.isRead ? 'text-ink-400' : 'font-semibold text-ink-700',
+                              'text-kr-pretty mt-1 line-clamp-1 text-sm',
+                              message.isRead
+                                ? 'text-muted-foreground'
+                                : 'font-semibold text-foreground/80',
                             )}
                           >
                             {message.content}
                           </p>
                         </div>
-                        <time className="shrink-0 text-xs font-semibold text-ink-400">
+                        <time className="text-kr-keep shrink-0 text-xs font-semibold text-muted-foreground">
                           {formatMessageDate(message.createdAt)}
                         </time>
                       </div>
@@ -202,95 +221,107 @@ function MessagesPageContent() {
               </div>
             ) : (
               <div className="flex min-h-[360px] items-center justify-center p-8 text-center">
-                <p className="text-base font-semibold text-ink-400">메시지가 없습니다.</p>
+                <p className="text-kr-pretty text-base font-semibold text-muted-foreground">
+                  메시지가 없습니다.
+                </p>
               </div>
             )}
-          </aside>
+          </Card>
 
-          <main className="rounded-2xl border border-border bg-white p-5 shadow-sm sm:p-6">
-            {selectedMessage ? (
-              <div className="flex h-full flex-col gap-5">
-                <section className="rounded-xl border border-border bg-white p-5 shadow-sm">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="text-xl font-bold text-ink-950">
-                          {selectedMessage.senderName}
-                        </h2>
-                        {selectedMessage.subject.includes('견적') && (
-                          <AppBadge variant="green">견적 협의</AppBadge>
-                        )}
-                      </div>
-                      <p className="mt-1 text-sm font-semibold text-ink-700">
-                        {selectedMessage.senderCompany}
-                      </p>
-                      <p className="mt-3 text-lg font-bold text-ink-950">
-                        {selectedMessage.subject}
-                      </p>
-                      <time className="mt-2 block text-sm font-medium text-ink-400">
-                        {formatMessageDate(selectedMessage.createdAt)}
-                      </time>
-                    </div>
-                    <AppBadge variant={selectedMessage.isRead ? 'slate' : 'blue'}>
-                      {selectedMessage.isRead ? '읽음' : '읽지 않음'}
-                    </AppBadge>
-                  </div>
-                </section>
-
-                <section className="rounded-xl border border-border-subtle bg-surface-muted p-5">
-                  <p className="whitespace-pre-wrap text-base leading-8 text-ink-700">
-                    {selectedMessage.content}
-                  </p>
-                </section>
-
-                <section className="flex min-h-[220px] flex-1 flex-col gap-4 rounded-xl border border-border bg-white p-5">
-                  <div className="flex-1 space-y-3">
-                    {selectedReplies.map((reply, index) => (
-                      <div key={`${selectedMessage.id}-${index}`} className="flex justify-end">
-                        <div className="max-w-[78%] rounded-2xl rounded-tr-sm bg-brand-light px-4 py-3 text-brand shadow-sm">
-                          <div className="mb-1 flex items-center justify-between gap-3 text-xs font-bold">
-                            <span>{currentUser?.name ?? '나'}</span>
-                            <time>방금 전</time>
-                          </div>
-                          <p className="whitespace-pre-wrap text-sm leading-6 text-ink-950">
-                            {reply}
-                          </p>
+          <Card className="border-border bg-card shadow-ct-soft">
+            <CardContent className="p-5 sm:p-6">
+              {selectedMessage ? (
+                <div className="flex h-full flex-col gap-5">
+                  <section className="rounded-xl border border-border bg-card p-5 shadow-ct-soft">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="text-kr-pretty text-xl font-bold text-foreground">
+                            {selectedMessage.senderName}
+                          </h2>
+                          {selectedMessage.subject.includes('견적') && (
+                            <Badge variant="success" className="text-kr-keep">
+                              견적 협의
+                            </Badge>
+                          )}
                         </div>
+                        <p className="text-kr-pretty mt-1 text-sm font-semibold text-muted-foreground">
+                          {selectedMessage.senderCompany}
+                        </p>
+                        <p className="text-kr-pretty mt-3 text-lg font-bold text-foreground">
+                          {selectedMessage.subject}
+                        </p>
+                        <time className="text-kr-keep mt-2 block text-sm font-medium text-muted-foreground">
+                          {formatMessageDate(selectedMessage.createdAt)}
+                        </time>
                       </div>
-                    ))}
-                  </div>
+                      <Badge
+                        variant={selectedMessage.isRead ? 'slate' : 'info'}
+                        className="text-kr-keep"
+                      >
+                        {selectedMessage.isRead ? '읽음' : '읽지 않음'}
+                      </Badge>
+                    </div>
+                  </section>
 
-                  <div className="grid gap-3 border-t border-border pt-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-                    <textarea
-                      rows={2}
-                      value={replyText}
-                      onChange={(event) => setReplyText(event.target.value)}
-                      onKeyDown={handleReplyKeyDown}
-                      placeholder="답장을 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)"
-                      className="w-full resize-none rounded-xl border border-slate-300 bg-surface px-4 py-3 text-base text-ink-950 outline-none transition placeholder:text-ink-400 focus:border-brand focus:ring-4 focus:ring-brand-light"
-                    />
-                    <AppButton
-                      variant="secondary"
-                      onClick={submitReply}
-                      disabled={!replyText.trim()}
-                    >
-                      <Send className="h-4 w-4" />
-                      전송
-                    </AppButton>
-                  </div>
-                </section>
-              </div>
-            ) : (
-              <div className="flex min-h-[560px] items-center justify-center rounded-xl border border-border bg-surface-muted p-8 text-center">
-                <div>
-                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-light text-brand">
-                    <Mail className="h-10 w-10" />
-                  </div>
-                  <p className="mt-5 text-xl font-bold text-ink-950">메시지를 선택하세요.</p>
+                  <section className="rounded-xl border border-border bg-muted p-5">
+                    <p className="text-kr-pretty whitespace-pre-wrap text-base leading-8 text-foreground/80">
+                      {selectedMessage.content}
+                    </p>
+                  </section>
+
+                  <section className="flex min-h-[220px] flex-1 flex-col gap-4 rounded-xl border border-border bg-card p-5">
+                    <div className="flex-1 space-y-3">
+                      {selectedReplies.map((reply, index) => (
+                        <div key={`${selectedMessage.id}-${index}`} className="flex justify-end">
+                          <div className="max-w-[78%] rounded-2xl rounded-tr-sm bg-brand-light px-4 py-3 text-brand shadow-sm">
+                            <div className="mb-1 flex items-center justify-between gap-3 text-xs font-bold">
+                              <span>{currentUser?.name ?? '나'}</span>
+                              <time>방금 전</time>
+                            </div>
+                            <p className="text-kr-pretty whitespace-pre-wrap text-sm leading-6 text-foreground">
+                              {reply}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid gap-3 border-t border-border pt-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+                      <Textarea
+                        rows={2}
+                        value={replyText}
+                        onChange={(event) => setReplyText(event.target.value)}
+                        onKeyDown={handleReplyKeyDown}
+                        placeholder="답장을 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)"
+                        className="min-h-[76px] resize-none rounded-xl bg-card text-base"
+                      />
+                      <Button
+                        variant="default"
+                        onClick={submitReply}
+                        disabled={!replyText.trim()}
+                        className="text-kr-keep"
+                      >
+                        <Send className="h-4 w-4" />
+                        전송
+                      </Button>
+                    </div>
+                  </section>
                 </div>
-              </div>
-            )}
-          </main>
+              ) : (
+                <div className="flex min-h-[560px] items-center justify-center rounded-xl border border-border bg-muted p-8 text-center">
+                  <div>
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-brand-light text-brand">
+                      <Mail className="h-10 w-10" />
+                    </div>
+                    <p className="text-kr-pretty mt-5 text-xl font-bold text-foreground">
+                      메시지를 선택하세요.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
@@ -299,16 +330,46 @@ function MessagesPageContent() {
 
 export default function MessagesPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-surface-muted px-4 py-8 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl rounded-2xl border border-border bg-white p-8 shadow-sm">
-            <p className="text-base font-semibold text-ink-700">메시지를 불러오는 중입니다.</p>
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<MessagesPageShell />}>
       <MessagesPageContent />
     </Suspense>
+  )
+}
+
+function MessagesPageShell() {
+  return (
+    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+      <div className="mx-auto max-w-7xl space-y-5">
+        <div className="space-y-2">
+          <Skeleton className="h-9 w-1/4" />
+          <Skeleton className="h-5 w-2/5" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <Card className="border-border bg-card">
+            <CardContent className="space-y-3 p-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="space-y-2 rounded-lg p-2">
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-3 w-1/3" />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card className="border-border bg-card">
+            <CardContent className="space-y-4 p-5 sm:p-6">
+              <Skeleton className="h-7 w-1/3" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-4/5" />
+              <Skeleton className="h-32 w-full" />
+              <div className="flex gap-2">
+                <Skeleton className="h-11 w-24 rounded-lg" />
+                <Skeleton className="h-11 w-24 rounded-lg" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
   )
 }

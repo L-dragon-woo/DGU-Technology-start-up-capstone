@@ -2,32 +2,165 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * RootMatch globals — v0.2 (Toss precision × senior-trust hybrid)
+ *
+ * Color tokens are mapped from RootMatch v0.2 brand:
+ *   primary    = root-navy   #0F2537  → HSL 204 57% 14%
+ *   accent     = match-teal  #0E8A8A  → HSL 180 82% 30%
+ *   success    = root-green/v0.2 success #16A34A → HSL 142 76% 36%
+ *   warning    = #F59E0B     → HSL 38 92% 50%
+ *   destructive= v0.2 error  #DC2626  → HSL 0 72% 51%
+ *   info       = #2563EB     → HSL 221 83% 53%
+ *   escrow     = #7C3AED     → HSL 263 82% 58%
+ *   foreground = iron-black  #111827  → HSL 222 39% 11%
+ *   border     = line-gray   #D1D5DB  → HSL 216 12% 84%
+ *
+ * Base font-size = 17px (v0.2 §3.4 — factory-owner mobile default).
+ * Body line-height = 1.6 (v0.2 §3.4).
+ */
+
 @layer base {
+  :root {
+    /* Surfaces */
+    --background: 0 0% 100%; /* white default */
+    --foreground: 222 39% 11%; /* iron-black */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 39% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 39% 11%;
+
+    /* Brand (RootMatch v0.2) */
+    --primary: 204 57% 14%; /* root-navy #0F2537 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 36 33% 94%; /* factory-sand subtle */
+    --secondary-foreground: 204 57% 14%; /* root-navy on sand */
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%; /* steel-gray */
+
+    /**
+     * shadcn `--accent` 컨벤션 — subtle backdrop (hover/selected/tag bg).
+     * v0.2 match-teal(#0E8A8A)을 직접 매핑하면 ToggleGroup/Sidebar active/
+     * RadioGroup checked/dropdown hover 등 모든 shadcn 컴포넌트가 짙은 teal
+     * 배경 + 어두운 text 조합으로 가독성 폭락. → soft teal tint로 재매핑.
+     * 본격적 teal 강조가 필요하면 `bg-match-teal` Tailwind 토큰 사용.
+     */
+    --accent: 180 50% 92%; /* soft match-teal tint (#E0F2F2 근사) */
+    --accent-foreground: 204 57% 14%; /* root-navy text on light bg */
+
+    /* Semantic */
+    --destructive: 0 72% 51%; /* v0.2 error #DC2626 */
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%; /* v0.2 success #16A34A */
+    --success-foreground: 0 0% 100%;
+    --success-subtle: 142 60% 94%;
+
+    --warning: 38 92% 50%; /* v0.2 warning #F59E0B */
+    --warning-foreground: 38 88% 22%;
+    --warning-subtle: 38 92% 95%;
+
+    --info: 221 83% 53%; /* v0.2 info #2563EB */
+    --info-foreground: 0 0% 100%;
+    --info-subtle: 221 83% 95%;
+
+    --escrow: 263 82% 58%; /* v0.2 escrow #7C3AED — 안심결제 */
+    --escrow-foreground: 0 0% 100%;
+    --escrow-subtle: 263 82% 96%;
+
+    /* Structural */
+    --border: 216 12% 84%; /* line-gray #D1D5DB */
+    --input: 216 12% 84%;
+    --ring: 204 57% 14%; /* root-navy for focus */
+
+    --radius: 0.875rem; /* 14px = v0.2 radius-lg */
+  }
+
+  .dark {
+    --background: 218 23% 9%;
+    --foreground: 0 0% 96%;
+
+    --card: 218 23% 13%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 218 23% 13%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 204 35% 75%; /* lighter navy for dark surface */
+    --primary-foreground: 204 57% 14%;
+
+    --secondary: 218 23% 18%;
+    --secondary-foreground: 0 0% 96%;
+
+    --muted: 218 23% 18%;
+    --muted-foreground: 215 13% 70%;
+
+    --accent: 180 30% 22%; /* darker teal subtle for dark surface */
+    --accent-foreground: 180 60% 85%;
+
+    --destructive: 0 72% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 50% 55%;
+    --success-foreground: 218 23% 9%;
+    --success-subtle: 142 25% 18%;
+
+    --warning: 38 92% 60%;
+    --warning-foreground: 218 23% 9%;
+    --warning-subtle: 38 30% 18%;
+
+    --info: 221 70% 65%;
+    --info-foreground: 218 23% 9%;
+    --info-subtle: 221 30% 20%;
+
+    --escrow: 263 70% 70%;
+    --escrow-foreground: 218 23% 9%;
+    --escrow-subtle: 263 30% 22%;
+
+    --border: 218 18% 24%;
+    --input: 218 18% 24%;
+    --ring: 204 35% 75%;
+  }
+
   html {
     color-scheme: light;
-    font-size: 18px;
+    /* v0.2 §3.4 — factory-owner mobile default 17px (시니어 친화 + Toss 정밀함 절충) */
+    font-size: 17px;
   }
 
   body {
-    background-color: theme('colors.surface.muted');
-    color: theme('colors.ink.800');
-    font-size: 1rem;
+    @apply bg-background text-foreground;
+    font-family:
+      var(--font-pretendard),
+      'Pretendard Variable',
+      Pretendard,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Apple SD Gothic Neo',
+      'Noto Sans KR',
+      system-ui,
+      sans-serif;
     line-height: 1.6;
-    font-feature-settings: 'cv11';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* v0.2 §3.4 — Korean line-break (no mid-word break) */
+    word-break: keep-all;
+    /* v0.2 §3.4 — tabular numbers for 금액·D-day·납기 */
+    font-variant-numeric: tabular-nums;
   }
 
   *:focus-visible {
-    outline: 3px solid theme('colors.brand.DEFAULT');
+    outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
     border-radius: 4px;
   }
 
-  button,
-  [role='button'],
   a {
-    min-height: 48px;
+    word-break: keep-all;
   }
 
   input[type='file'].sr-only {
@@ -36,39 +169,52 @@
 }
 
 @layer utilities {
-  .bg-brand {
-    background-color: theme('colors.toss.blue.900') !important;
+  /* ─── Korean text wrap utilities (v0.2 §3.4 — 줄 넘김 한국어) ─── */
+  .text-kr-keep {
+    word-break: keep-all;
+    overflow-wrap: normal;
   }
 
-  .text-brand {
-    color: theme('colors.toss.blue.900') !important;
+  .text-kr-pretty {
+    word-break: keep-all;
+    text-wrap: pretty;
   }
 
-  .bg-danger {
-    background-color: theme('colors.toss.red.900') !important;
+  .text-kr-balance {
+    word-break: keep-all;
+    text-wrap: balance;
   }
 
-  .text-danger {
-    color: theme('colors.toss.red.900') !important;
+  .text-anywhere {
+    overflow-wrap: anywhere;
   }
-}
 
-@layer utilities {
+  /* ─── v0.2 touch target utilities ─── */
   .tap-target-min {
+    /* v0.2 §6.1 — minimum hit area */
     min-height: 48px;
     min-width: 48px;
   }
 
+  .tap-target-secondary {
+    /* v0.2 §6.1 — secondary button recommended */
+    min-height: 52px;
+    min-width: 52px;
+  }
+
   .tap-target-primary {
+    /* v0.2 §6.1 — primary button recommended */
     min-height: 56px;
     min-width: 56px;
   }
 
   .tap-target-critical {
-    min-height: 64px;
-    min-width: 64px;
+    /* 계약·안심결제·분쟁 등 critical */
+    min-height: 60px;
+    min-width: 60px;
   }
 
+  /* ─── Senior-readable text utilities (보존) ─── */
   .text-body-senior {
     font-size: 18px;
     line-height: 1.6;
@@ -78,5 +224,45 @@
     font-size: 17px;
     line-height: 1.5;
     font-weight: 500;
+  }
+
+  /* ─── v0.2 surface utilities ─── */
+  .bg-factory-sand {
+    background-color: #f5f1ea;
+  }
+
+  .bg-factory-sand-soft {
+    background-color: #faf7f2;
+  }
+
+  /* ─── Brand override utilities (v0.2 root-navy로 매핑) ───
+   * NOTE: Tailwind colors.brand → #0F2537 매핑되어 있으므로 `bg-brand`/`text-brand` 사용 시
+   * Tailwind utility가 자동으로 root-navy 색을 적용한다. 아래는 dark surface 위에서
+   * !important로 강제 적용이 필요한 한정 케이스용. (가능하면 토큰 사용 권장.) */
+  .bg-brand {
+    background-color: #0f2537 !important;
+  }
+
+  .text-brand {
+    color: #0f2537 !important;
+  }
+
+  .bg-danger {
+    background-color: #dc2626 !important;
+  }
+
+  .text-danger {
+    color: #dc2626 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

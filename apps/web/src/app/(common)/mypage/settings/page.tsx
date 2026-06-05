@@ -8,8 +8,11 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { AppBadge } from '@/components/ui/AppBadge'
 import { AppButton } from '@/components/ui/AppButton'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { mockCurrentUser } from '@/data/users'
-import { cn } from '@/lib/cn'
 import { useUserDispatch, useUserState } from '@/state/UserContext'
 
 const profileSchema = z.object({
@@ -27,11 +30,10 @@ const tabItems = [
   { label: '계정 설정', href: '/mypage/settings', current: true },
 ]
 
-const inputClassName =
-  'h-12 w-full rounded-xl border border-slate-300 bg-surface px-4 text-base text-ink-950 outline-none transition placeholder:text-ink-400 focus:border-brand focus:ring-4 focus:ring-brand-light'
-const labelClassName = 'mb-2 block text-sm font-semibold text-ink-700'
-const errorClassName = 'mt-2 text-sm font-semibold text-danger'
-const successClassName = 'text-sm font-semibold text-success'
+const inputClassName = 'h-11 bg-card text-[15px]'
+const labelClassName = 'text-kr-keep text-[16px] font-semibold text-foreground'
+const errorClassName = 'mt-2 text-[15px] font-semibold text-destructive'
+const successClassName = 'text-kr-pretty text-[15px] font-semibold text-success'
 
 function buildDefaultValues(currentUser: typeof mockCurrentUser): ProfileFormValues {
   return {
@@ -103,7 +105,7 @@ export default function MyPageSettingsPage() {
     }
 
     setPasswordError('')
-    setPasswordSuccess('비밀번호가 변경되었습니다. (목업)')
+    setPasswordSuccess('비밀번호가 변경되었습니다.')
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
@@ -114,8 +116,8 @@ export default function MyPageSettingsPage() {
   }
 
   return (
-    <div className="px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl space-y-8">
+    <div className="bg-background px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mx-auto max-w-4xl space-y-6">
         <nav aria-label="마이페이지 메뉴" className="flex flex-wrap gap-2">
           {tabItems.map((item) =>
             item.current ? (
@@ -130,7 +132,7 @@ export default function MyPageSettingsPage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-ink-700 transition hover:border-brand-light hover:bg-brand-light/40 hover:text-brand"
+                className="text-kr-keep rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary/30 hover:bg-accent hover:text-primary"
               >
                 {item.label}
               </Link>
@@ -143,67 +145,69 @@ export default function MyPageSettingsPage() {
             <Settings className="h-4 w-4" />
             계정 설정
           </AppBadge>
-          <h1 className="mt-5 text-3xl font-bold text-ink-950 sm:text-4xl">계정 설정</h1>
-          <p className="mt-3 text-lg leading-8 text-ink-700">
+          <h1 className="text-kr-pretty mt-5 text-[24px] font-bold text-foreground sm:text-[28px]">
+            계정 설정
+          </h1>
+          <p className="text-kr-pretty mt-2 text-[15px] leading-7 text-muted-foreground">
             사용자 정보와 알림 설정을 관리하세요.
           </p>
         </header>
 
-        <section className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-          <div className="border-b border-border p-6">
+        <Card className="border-border bg-card shadow-ct-soft">
+          <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-primary">
                 <UserRound className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold text-ink-950">사용자 정보</h2>
+              <CardTitle className="text-kr-pretty text-[18px] font-bold">사용자 정보</CardTitle>
             </div>
-          </div>
+          </CardHeader>
 
-          <form onSubmit={handleSubmit(saveProfile)} className="grid gap-5 p-6 sm:grid-cols-2">
-            <Field label="이름" htmlFor="name" error={errors.name?.message}>
-              <input id="name" type="text" className={inputClassName} {...register('name')} />
-            </Field>
+          <CardContent>
+            <form
+              onSubmit={handleSubmit(saveProfile)}
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+            >
+              <Field label="이름" htmlFor="name" error={errors.name?.message}>
+                <Input id="name" className={inputClassName} {...register('name')} />
+              </Field>
 
-            <Field label="직책" htmlFor="position" error={errors.position?.message}>
-              <input
-                id="position"
-                type="text"
-                className={inputClassName}
-                {...register('position')}
-              />
-            </Field>
+              <Field label="직책" htmlFor="position" error={errors.position?.message}>
+                <Input id="position" className={inputClassName} {...register('position')} />
+              </Field>
 
-            <Field label="이메일" htmlFor="email" error={errors.email?.message}>
-              <input id="email" type="email" className={inputClassName} {...register('email')} />
-            </Field>
+              <Field label="이메일" htmlFor="email" error={errors.email?.message}>
+                <Input id="email" type="email" className={inputClassName} {...register('email')} />
+              </Field>
 
-            <Field label="연락처" htmlFor="phone" error={errors.phone?.message}>
-              <input id="phone" type="tel" className={inputClassName} {...register('phone')} />
-            </Field>
+              <Field label="연락처" htmlFor="phone" error={errors.phone?.message}>
+                <Input id="phone" type="tel" className={inputClassName} {...register('phone')} />
+              </Field>
 
-            <div className="flex items-center gap-4 sm:col-span-2">
-              <AppButton type="submit" disabled={isSubmitting}>
-                <Save className="h-4 w-4" />
-                정보 저장
-              </AppButton>
-              {profileSaved && <p className={successClassName}>정보가 저장되었습니다.</p>}
-            </div>
-          </form>
-        </section>
+              <div className="flex items-center gap-4 sm:col-span-2">
+                <AppButton type="submit" disabled={isSubmitting}>
+                  <Save className="h-4 w-4" />
+                  정보 저장
+                </AppButton>
+                {profileSaved && <p className={successClassName}>정보가 저장되었습니다.</p>}
+              </div>
+            </form>
+          </CardContent>
+        </Card>
 
-        <section className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-          <div className="border-b border-border p-6">
+        <Card className="border-border bg-card shadow-ct-soft">
+          <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-primary">
                 <LockKeyhole className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold text-ink-950">비밀번호 변경</h2>
+              <CardTitle className="text-kr-pretty text-[18px] font-bold">비밀번호 변경</CardTitle>
             </div>
-          </div>
+          </CardHeader>
 
-          <div className="grid gap-5 p-6">
+          <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="현재 비밀번호" htmlFor="currentPassword">
-              <input
+              <Input
                 id="currentPassword"
                 type="password"
                 value={currentPassword}
@@ -213,7 +217,7 @@ export default function MyPageSettingsPage() {
             </Field>
 
             <Field label="새 비밀번호" htmlFor="newPassword">
-              <input
+              <Input
                 id="newPassword"
                 type="password"
                 value={newPassword}
@@ -223,7 +227,7 @@ export default function MyPageSettingsPage() {
             </Field>
 
             <Field label="비밀번호 확인" htmlFor="confirmPassword">
-              <input
+              <Input
                 id="confirmPassword"
                 type="password"
                 value={confirmPassword}
@@ -235,25 +239,25 @@ export default function MyPageSettingsPage() {
             {passwordError && <p className={errorClassName}>{passwordError}</p>}
             {passwordSuccess && <p className={successClassName}>{passwordSuccess}</p>}
 
-            <div>
+            <div className="sm:col-span-2">
               <AppButton type="button" onClick={changePassword}>
                 비밀번호 변경
               </AppButton>
             </div>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
 
-        <section className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
-          <div className="border-b border-border p-6">
+        <Card className="border-border bg-card shadow-ct-soft">
+          <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light text-brand">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-primary">
                 <Bell className="h-5 w-5" />
               </div>
-              <h2 className="text-2xl font-bold text-ink-950">알림 설정</h2>
+              <CardTitle className="text-kr-pretty text-[18px] font-bold">알림 설정</CardTitle>
             </div>
-          </div>
+          </CardHeader>
 
-          <div className="space-y-5 p-6">
+          <CardContent className="space-y-5">
             <ToggleRow
               label="이메일 알림"
               enabled={emailNotif}
@@ -271,8 +275,8 @@ export default function MyPageSettingsPage() {
               </AppButton>
               {notificationSaved && <p className={successClassName}>알림 설정이 저장되었습니다.</p>}
             </div>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
@@ -291,9 +295,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className={labelClassName} htmlFor={htmlFor}>
+      <Label className={labelClassName} htmlFor={htmlFor}>
         {label}
-      </label>
+      </Label>
       {children}
       {error && <p className={errorClassName}>{error}</p>}
     </div>
@@ -310,24 +314,9 @@ function ToggleRow({
   onToggle: () => void
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface-muted px-4 py-4">
-      <span className="text-sm font-bold text-ink-950">{label}</span>
-      <button
-        type="button"
-        aria-pressed={enabled}
-        onClick={onToggle}
-        className={cn(
-          'relative h-7 w-12 rounded-full transition',
-          enabled ? 'bg-brand' : 'bg-slate-300',
-        )}
-      >
-        <span
-          className={cn(
-            'absolute top-1 h-5 w-5 rounded-full bg-white transition',
-            enabled ? 'left-6' : 'left-1',
-          )}
-        />
-      </button>
+    <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted px-4 py-4">
+      <span className="text-kr-keep text-sm font-bold text-foreground">{label}</span>
+      <Switch checked={enabled} onCheckedChange={onToggle} aria-label={label} />
     </div>
   )
 }

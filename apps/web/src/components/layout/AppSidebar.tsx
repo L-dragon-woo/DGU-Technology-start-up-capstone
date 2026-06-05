@@ -12,13 +12,15 @@ import {
   LayoutDashboard,
   MessageSquare,
   PackageCheck,
+  PanelLeftClose,
   Search,
   Settings,
   Sparkles,
   User,
   type LucideIcon,
 } from 'lucide-react'
-import { cn } from '@/lib/cn'
+import { Logo } from '@/components/brand/Logo'
+import { cn } from '@/lib/utils'
 
 interface NavItem {
   href: string
@@ -33,6 +35,9 @@ interface NavGroup {
 
 interface AppSidebarProps {
   className?: string
+  onNavigate?: () => void
+  /** Desktop only. Mobile Sheet은 컴포넌트 자체의 X 버튼 사용. */
+  onClose?: () => void
 }
 
 const navGroups: NavGroup[] = [
@@ -77,25 +82,35 @@ const navGroups: NavGroup[] = [
   },
 ]
 
-export function AppSidebar({ className }: AppSidebarProps) {
+export function AppSidebar({ className, onNavigate, onClose }: AppSidebarProps) {
   const pathname = usePathname()
 
   return (
-    <div className={cn('sticky top-0 flex h-screen flex-col overflow-y-auto px-4 py-5', className)}>
-      <Link href="/" className="mb-6 flex items-center gap-3 rounded-2xl px-2 py-2 text-ink-950">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-white">
-          <Sparkles className="h-5 w-5" />
-        </span>
-        <div className="text-xl font-black">Rootmatching</div>
-      </Link>
+    <div className={cn('flex h-full flex-col overflow-y-auto bg-card px-3 py-4', className)}>
+      <div className="mb-5 flex items-center justify-between gap-2 px-2 py-1.5">
+        <Link href="/" onClick={onNavigate} className="inline-flex items-center">
+          <Logo variant="primary" size="md" href={null} alt="RootMatch — 홈으로" />
+        </Link>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="hidden h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:flex"
+            aria-label="사이드바 닫기"
+            title="사이드바 닫기"
+          >
+            <PanelLeftClose className="h-5 w-5" />
+          </button>
+        )}
+      </div>
 
-      <nav className="space-y-5">
+      <nav className="flex-1 space-y-5">
         {navGroups.map((group) => (
           <section key={group.title}>
-            <h2 className="mb-2 px-3 text-xs font-black uppercase tracking-wide text-ink-400">
+            <h2 className="mb-1.5 px-3 text-[13px] font-bold uppercase tracking-wider text-muted-foreground">
               {group.title}
             </h2>
-            <ul className="space-y-1">
+            <ul className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = item.icon
                 const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
@@ -104,15 +119,16 @@ export function AppSidebar({ className }: AppSidebarProps) {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      onClick={onNavigate}
                       className={cn(
-                        'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition',
+                        'flex items-center gap-3 rounded-lg px-3 py-2 text-[16px] font-semibold transition',
                         active
-                          ? 'bg-brand-light text-brand'
-                          : 'text-ink-700 hover:bg-surface-muted hover:text-brand',
+                          ? 'bg-accent text-accent-foreground'
+                          : 'text-foreground/80 hover:bg-muted hover:text-foreground',
                       )}
                     >
-                      <Icon className="h-5 w-5" />
-                      {item.label}
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span className="text-kr-keep truncate">{item.label}</span>
                     </Link>
                   </li>
                 )

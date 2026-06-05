@@ -3,6 +3,7 @@ import {
   type ExecutionContext,
   Module,
 } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { createZodValidationPipe } from 'nestjs-zod';
@@ -13,6 +14,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CompaniesModule } from './companies/companies.module';
+import { ContractsModule } from './contracts/contracts.module';
 import { HealthModule } from './health/health.module';
 import { MatchingModule } from './matching/matching.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -45,6 +47,7 @@ function requestPath(context: ExecutionContext): string {
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     LoggerModule.forRoot({
       pinoHttp: {
         enabled: !isTest,
@@ -135,6 +138,7 @@ function requestPath(context: ExecutionContext): string {
     MatchingModule,
     UsersModule,
     CompaniesModule,
+    ContractsModule,
     HealthModule,
   ],
   controllers: [AppController],

@@ -5,6 +5,17 @@ import Link from 'next/link'
 import { ArrowRight, Clock, FileText, Search, SlidersHorizontal, Sparkles } from 'lucide-react'
 import type { ReceivedQuoteRequestStatus } from '@rootmatching/shared'
 import { AppBadge } from '@/components/ui/AppBadge'
+import { Badge, type BadgeProps } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { mockReceivedQuoteRequests } from '@/data/requestData'
 
 type StatusFilter = ReceivedQuoteRequestStatus | 'all'
@@ -19,10 +30,10 @@ function getStatusLabel(status: ReceivedQuoteRequestStatus): string {
   return '견적 도착'
 }
 
-function getStatusVariant(status: ReceivedQuoteRequestStatus): 'blue' | 'green' | 'amber' {
-  if (status === 'new') return 'blue'
-  if (status === 'reviewing') return 'amber'
-  return 'green'
+function getStatusVariant(status: ReceivedQuoteRequestStatus): BadgeProps['variant'] {
+  if (status === 'new') return 'info'
+  if (status === 'reviewing') return 'warning'
+  return 'success'
 }
 
 export default function ClientRequestListPage() {
@@ -43,108 +54,131 @@ export default function ClientRequestListPage() {
   }, [keyword, statusFilter])
 
   return (
-    <div className="min-h-screen bg-surface-muted px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
       <div className="mx-auto max-w-7xl">
-        <header className="mb-8 overflow-hidden rounded-2xl border border-brand-light bg-white shadow-sm">
+        <header className="mb-8 overflow-hidden rounded-2xl border border-border bg-card shadow-ct-soft">
           <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-brand-light px-4 py-2 text-sm font-semibold text-brand">
+              <AppBadge
+                variant="blue"
+                className="text-kr-keep mb-4 px-4 py-2 text-sm font-semibold"
+              >
                 <Sparkles className="h-4 w-4" />
                 견적 요청 관리
-              </div>
-              <h1 className="text-3xl font-bold tracking-normal text-ink-950 sm:text-4xl">
+              </AppBadge>
+              <h1 className="text-kr-keep text-[clamp(1.5rem,1.3rem+1vw,2rem)] font-bold tracking-normal text-foreground">
                 내 견적 요청 내역
               </h1>
-              <p className="mt-3 max-w-3xl text-lg leading-8 text-ink-700">
+              <p className="text-kr-pretty mt-3 max-w-3xl text-base leading-8 text-muted-foreground sm:text-lg">
                 내가 등록한 견적 요청의 검토 상태, 요청 조건, 첨부 자료를 한 곳에서 확인합니다.
               </p>
             </div>
           </div>
         </header>
 
-        <section className="mb-6 rounded-2xl border border-border bg-white p-4 shadow-sm">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_220px]">
-            <label className="relative block">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-400" />
-              <input
-                value={keyword}
-                onChange={(event) => setKeyword(event.target.value)}
-                type="search"
-                placeholder="프로젝트명, 품목, 공정으로 검색"
-                className="h-12 w-full rounded-xl border border-slate-300 pl-12 pr-4 text-base outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-light"
-              />
-            </label>
-            <label className="relative block">
-              <SlidersHorizontal className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-400" />
-              <select
-                value={statusFilter}
-                onChange={(event) => {
-                  if (isStatusFilter(event.target.value)) {
-                    setStatusFilter(event.target.value)
-                  }
-                }}
-                className="h-12 w-full appearance-none rounded-xl border border-slate-300 bg-white pl-12 pr-4 text-base outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-light"
-              >
-                <option value="all">전체 상태</option>
-                <option value="new">공장 검토 전</option>
-                <option value="reviewing">공장 검토 중</option>
-                <option value="quoted">견적 도착</option>
-              </select>
-            </label>
-          </div>
-        </section>
-
-        <main className="grid grid-cols-1 gap-5">
-          {filteredRequests.map((request) => (
-            <article
-              key={request.id}
-              className="rounded-2xl border border-border bg-white p-5 shadow-sm transition hover:border-brand-light hover:shadow-md sm:p-6"
-            >
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                  <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <AppBadge variant={getStatusVariant(request.status)}>
-                      {getStatusLabel(request.status)}
-                    </AppBadge>
-                    <span className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-400">
-                      <Clock className="h-4 w-4" />
-                      {request.requestedAt}
-                    </span>
-                  </div>
-                  <h2 className="text-2xl font-bold text-ink-950">{request.projectName}</h2>
-                  <p className="mt-2 text-base text-ink-700">{request.productItem}</p>
-                </div>
-
-                <Link
-                  href={`/requests/${request.id}`}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-bold text-ink-700 transition hover:border-brand-light hover:bg-brand-light/40 hover:text-brand"
+        <Card className="mb-6 border-border bg-card shadow-ct-soft">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_220px]">
+              <label className="relative block">
+                <span className="sr-only">견적 요청 검색</span>
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={keyword}
+                  onChange={(event) => setKeyword(event.target.value)}
+                  type="search"
+                  placeholder="프로젝트명, 품목, 공정으로 검색"
+                  className="h-12 rounded-xl bg-card pl-12 text-base"
+                />
+              </label>
+              <label className="relative block">
+                <span className="sr-only">상태 필터</span>
+                <SlidersHorizontal className="pointer-events-none absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                <Select
+                  value={statusFilter}
+                  onValueChange={(value) => {
+                    if (isStatusFilter(value)) {
+                      setStatusFilter(value)
+                    }
+                  }}
                 >
-                  {request.status === 'quoted' ? '매칭 결과 보기' : '요청 수정'}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
+                  <SelectTrigger className="h-12 rounded-xl bg-card pl-12 text-base">
+                    <SelectValue placeholder="전체 상태" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">전체 상태</SelectItem>
+                    <SelectItem value="new">공장 검토 전</SelectItem>
+                    <SelectItem value="reviewing">공장 검토 중</SelectItem>
+                    <SelectItem value="quoted">견적 도착</SelectItem>
+                  </SelectContent>
+                </Select>
+              </label>
+            </div>
+          </CardContent>
+        </Card>
 
-              <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <DataCell label="공정" value={request.processType} />
-                <DataCell label="수량" value={request.quantity} />
-                <DataCell label="예산" value={request.budgetRange} />
-                <DataCell label="희망 납기" value={request.desiredDeadline} />
-              </dl>
+        <main className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+          {filteredRequests.map((request) => (
+            <Card
+              key={request.id}
+              className="border-border bg-card shadow-ct-soft transition hover:border-brand-light hover:shadow-ct-card"
+            >
+              <CardHeader className="p-4 pb-0 sm:p-5 sm:pb-0">
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                      <Badge variant={getStatusVariant(request.status)} className="text-kr-keep">
+                        {getStatusLabel(request.status)}
+                      </Badge>
+                      <span className="text-kr-keep inline-flex items-center gap-1.5 text-[15px] font-medium text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        {request.requestedAt}
+                      </span>
+                    </div>
+                    <CardTitle className="text-kr-pretty text-[15px] font-bold leading-6 text-foreground sm:text-[16px]">
+                      {request.projectName}
+                    </CardTitle>
+                    <p className="text-kr-pretty mt-2 text-[15px] text-muted-foreground">
+                      {request.productItem}
+                    </p>
+                  </div>
 
-              <div className="mt-4 flex items-center gap-2 text-sm text-ink-400">
-                <FileText className="h-4 w-4" />
-                첨부 자료 {request.attachments.length}개
-              </div>
-            </article>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="text-kr-keep w-full sm:w-auto"
+                  >
+                    <Link href={`/requests/${request.id}`}>
+                      {request.status === 'quoted' ? '매칭 결과 보기' : '요청 수정'}
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </CardHeader>
+
+              <CardContent className="p-4 sm:p-5">
+                <dl className="grid grid-cols-1 gap-3">
+                  <DataCell label="공정" value={request.processType} />
+                  <DataCell label="수량" value={request.quantity} />
+                  <DataCell label="예산" value={request.budgetRange} />
+                  <DataCell label="희망 납기" value={request.desiredDeadline} />
+                </dl>
+
+                <div className="text-kr-keep mt-4 flex items-center gap-2 text-[15px] text-muted-foreground">
+                  <FileText className="h-4 w-4" />
+                  첨부 자료 {request.attachments.length}개
+                </div>
+              </CardContent>
+            </Card>
           ))}
 
           {filteredRequests.length === 0 && (
-            <div className="rounded-2xl border border-border bg-white p-12 text-center">
-              <Sparkles className="mx-auto h-12 w-12 text-ink-400" />
-              <p className="mt-4 text-lg font-semibold text-ink-700">
+            <Card className="border-border bg-card p-12 text-center shadow-ct-soft sm:col-span-2 lg:col-span-3">
+              <Sparkles className="mx-auto h-12 w-12 text-muted-foreground" />
+              <p className="text-kr-pretty mt-4 text-lg font-semibold text-muted-foreground">
                 조건에 맞는 견적 요청이 없습니다.
               </p>
-            </div>
+            </Card>
           )}
         </main>
       </div>
@@ -155,8 +189,8 @@ export default function ClientRequestListPage() {
 function DataCell({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl bg-surface-muted p-4">
-      <dt className="text-sm font-semibold text-ink-400">{label}</dt>
-      <dd className="mt-1 font-bold text-ink-950">{value}</dd>
+      <dt className="text-kr-keep text-[15px] font-semibold text-muted-foreground">{label}</dt>
+      <dd className="text-kr-pretty mt-1 font-bold text-foreground">{value}</dd>
     </div>
   )
 }

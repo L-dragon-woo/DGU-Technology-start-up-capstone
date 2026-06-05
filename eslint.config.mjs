@@ -16,6 +16,7 @@ export default [
       '**/out/**',
       '**/build/**',
       'apps/web/next-env.d.ts',
+      '**/next-env.d.ts',
       'pnpm-lock.yaml',
       '.sisyphus/**',
       '.omx/**',
@@ -55,6 +56,31 @@ export default [
       ...nextPlugin.configs['core-web-vitals'].rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'Literal[value=/\\bborder-(l|r)-(?:[1-9]|primary|success|warning|info|destructive|brand|accent|secondary)\\b/]',
+          message:
+            'Decorative side-border stripes (border-l-4, border-l-primary, border-r-success, ...) are forbidden by RootMatch design principle. Use bg color, icon chip, typography weight, or a full border instead. See AGENTS.md > Design Principles > No Card Stripes.',
+        },
+        {
+          selector:
+            'TemplateElement[value.raw=/\\bborder-(l|r)-(?:[1-9]|primary|success|warning|info|destructive|brand|accent|secondary)\\b/]',
+          message:
+            'Decorative side-border stripes (border-l-4, border-l-primary, border-r-success, ...) are forbidden by RootMatch design principle. Use bg color, icon chip, typography weight, or a full border instead. See AGENTS.md > Design Principles > No Card Stripes.',
+        },
+        {
+          selector: 'Literal[value=/\\btext-\\[1[01]px\\]/]',
+          message:
+            'Senior-first UX: text-[10px] / text-[11px] is below the readable minimum for RootMatch senior users (50+). Use text-[12px] for badges/meta, text-[13-15px] for support, text-[15-17px] for body. See AGENTS.md > Design Principles > Senior-First UX.',
+        },
+        {
+          selector: 'TemplateElement[value.raw=/\\btext-\\[1[01]px\\]/]',
+          message:
+            'Senior-first UX: text-[10px] / text-[11px] is below the readable minimum for RootMatch senior users (50+). Use text-[12px] for badges/meta, text-[13-15px] for support, text-[15-17px] for body. See AGENTS.md > Design Principles > Senior-First UX.',
+        },
+      ],
     },
   },
 

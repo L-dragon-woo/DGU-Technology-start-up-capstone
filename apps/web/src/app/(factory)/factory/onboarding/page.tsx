@@ -18,6 +18,12 @@ import {
 } from 'lucide-react'
 import { AppBadge } from '@/components/ui/AppBadge'
 import { AppButton } from '@/components/ui/AppButton'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/cn'
 
 const basicInfoSchema = z.object({
@@ -58,11 +64,12 @@ const BASE_PROCESSES = [
   '도장',
 ] as const
 
-const inputClassName =
-  'h-12 w-full rounded-xl border border-slate-300 px-4 outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-light'
-const textareaClassName =
-  'w-full resize-none rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-brand focus:ring-4 focus:ring-brand-light'
-const labelClassName = 'mb-2 block text-sm font-semibold text-ink-700'
+const fieldClassName = 'space-y-1.5'
+const inputClassName = 'h-11 bg-card text-[15px]'
+const textareaClassName = 'resize-none bg-card text-[15px]'
+const labelClassName = 'text-kr-keep text-[16px] font-semibold text-foreground'
+const cardClassName = 'mb-6 border-border bg-card shadow-ct-soft'
+const errorClassName = 'mt-1 text-[15px] font-semibold text-destructive'
 
 const initialBasicInfo: BasicInfo = {
   factoryName: '',
@@ -82,7 +89,7 @@ function getNextProductionId(productionItems: ProductionItem[]): string {
 }
 
 function RequiredMark() {
-  return <span className="text-danger ml-1">*</span>
+  return <span className="ml-1 text-destructive">*</span>
 }
 
 export default function FactoryOnboardingPage() {
@@ -104,14 +111,6 @@ export default function FactoryOnboardingPage() {
   const [equipment, setEquipment] = useState('')
   const [certifications, setCertifications] = useState('')
   const [savedAt, setSavedAt] = useState<string | null>(null)
-
-  function toggleProcess(process: string) {
-    setSelectedProcesses((current) =>
-      current.includes(process)
-        ? current.filter((item) => item !== process)
-        : [...current, process],
-    )
-  }
 
   function addCustomProcess() {
     const nextProcess = customProcessInput.trim()
@@ -195,25 +194,27 @@ export default function FactoryOnboardingPage() {
   }
 
   return (
-    <div className="px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
-        <header className="mb-8 rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
+    <div className="bg-background px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mx-auto max-w-4xl">
+        <header className="mb-6 rounded-xl border border-border bg-card p-5 shadow-ct-soft sm:p-6">
           <AppBadge variant="blue">
             <Factory className="h-4 w-4" />
             공장 프로필 등록
           </AppBadge>
-          <h1 className="mt-4 text-3xl font-bold text-ink-950 sm:text-4xl">공장 프로필 등록</h1>
-          <p className="mt-3 text-base leading-7 text-ink-700">
+          <h1 className="text-kr-pretty mt-4 text-[24px] font-bold text-foreground sm:text-[28px]">
+            공장 프로필 등록
+          </h1>
+          <p className="text-kr-pretty mt-2 text-[15px] leading-7 text-muted-foreground">
             공장 정보를 입력하면 발주처에게 우리 공장의 강점을 정확히 전달할 수 있습니다.
           </p>
         </header>
 
         {savedAt && (
-          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-700">
+          <div className="mb-6 rounded-xl border border-success/20 bg-success-subtle p-5 text-success">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex gap-3">
                 <CheckCircle className="mt-0.5 h-5 w-5 shrink-0" />
-                <p className="font-semibold">
+                <p className="text-kr-pretty font-semibold">
                   프로필이 저장되었습니다. 이제 견적 요청을 받을 준비가 되었습니다.
                 </p>
               </div>
@@ -229,311 +230,328 @@ export default function FactoryOnboardingPage() {
         )}
 
         <form onSubmit={handleSubmitBasic(submitOnboarding)}>
-          <section className="mb-6 rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
-            <div className="mb-6 flex items-start gap-3">
-              <div className="rounded-xl bg-brand-light p-3 text-brand">
-                <Building2 className="h-5 w-5" />
+          <Card className={cardClassName}>
+            <CardHeader>
+              <div className="flex items-start gap-3">
+                <div className="rounded-xl bg-brand-light p-3 text-brand">
+                  <Building2 className="h-5 w-5" />
+                </div>
+                <div>
+                  <CardTitle className="text-kr-pretty text-[18px] font-bold">기본 정보</CardTitle>
+                  <CardDescription className="text-kr-pretty text-[15px]">
+                    발주처가 공장을 신뢰하고 연락할 수 있는 기본 정보를 입력하세요.
+                  </CardDescription>
+                </div>
               </div>
-              <div>
-                <h2 className="mb-1 text-2xl font-bold text-ink-950">기본 정보</h2>
-                <p className="text-base text-ink-700">
-                  발주처가 공장을 신뢰하고 연락할 수 있는 기본 정보를 입력하세요.
-                </p>
-              </div>
-            </div>
+            </CardHeader>
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <label>
-                <span className={labelClassName}>
+            <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className={fieldClassName}>
+                <Label className={labelClassName}>
                   공장명
                   <RequiredMark />
-                </span>
-                <input {...registerBasic('factoryName')} className={inputClassName} />
+                </Label>
+                <Input {...registerBasic('factoryName')} className={inputClassName} />
                 {basicErrors.factoryName ? (
-                  <p className="mt-1 text-sm text-danger">{basicErrors.factoryName.message}</p>
+                  <p className={errorClassName}>{basicErrors.factoryName.message}</p>
                 ) : null}
-              </label>
+              </div>
 
-              <label>
-                <span className={labelClassName}>
+              <div className={fieldClassName}>
+                <Label className={labelClassName}>
                   담당자
                   <RequiredMark />
-                </span>
-                <input {...registerBasic('ownerName')} className={inputClassName} />
+                </Label>
+                <Input {...registerBasic('ownerName')} className={inputClassName} />
                 {basicErrors.ownerName ? (
-                  <p className="mt-1 text-sm text-danger">{basicErrors.ownerName.message}</p>
+                  <p className={errorClassName}>{basicErrors.ownerName.message}</p>
                 ) : null}
-              </label>
+              </div>
 
-              <label>
-                <span className={labelClassName}>
+              <div className={fieldClassName}>
+                <Label className={labelClassName}>
                   위치
                   <RequiredMark />
-                </span>
-                <input {...registerBasic('location')} className={inputClassName} />
+                </Label>
+                <Input {...registerBasic('location')} className={inputClassName} />
                 {basicErrors.location ? (
-                  <p className="mt-1 text-sm text-danger">{basicErrors.location.message}</p>
+                  <p className={errorClassName}>{basicErrors.location.message}</p>
                 ) : null}
-              </label>
+              </div>
 
-              <label>
-                <span className={labelClassName}>
+              <div className={fieldClassName}>
+                <Label className={labelClassName}>
                   연락처
                   <RequiredMark />
-                </span>
-                <input {...registerBasic('contactPhone')} className={inputClassName} />
+                </Label>
+                <Input {...registerBasic('contactPhone')} className={inputClassName} />
                 {basicErrors.contactPhone ? (
-                  <p className="mt-1 text-sm text-danger">{basicErrors.contactPhone.message}</p>
+                  <p className={errorClassName}>{basicErrors.contactPhone.message}</p>
                 ) : null}
-              </label>
+              </div>
 
-              <label>
-                <span className={labelClassName}>이메일</span>
-                <input type="email" {...registerBasic('contactEmail')} className={inputClassName} />
+              <div className={fieldClassName}>
+                <Label className={labelClassName}>이메일</Label>
+                <Input type="email" {...registerBasic('contactEmail')} className={inputClassName} />
                 {basicErrors.contactEmail ? (
-                  <p className="mt-1 text-sm text-danger">{basicErrors.contactEmail.message}</p>
+                  <p className={errorClassName}>{basicErrors.contactEmail.message}</p>
                 ) : null}
-              </label>
+              </div>
 
-              <label>
-                <span className={labelClassName}>웹사이트</span>
-                <input type="url" {...registerBasic('website')} className={inputClassName} />
+              <div className={fieldClassName}>
+                <Label className={labelClassName}>웹사이트</Label>
+                <Input type="url" {...registerBasic('website')} className={inputClassName} />
                 {basicErrors.website ? (
-                  <p className="mt-1 text-sm text-danger">{basicErrors.website.message}</p>
+                  <p className={errorClassName}>{basicErrors.website.message}</p>
                 ) : null}
-              </label>
+              </div>
 
-              <label className="sm:col-span-2">
-                <span className={labelClassName}>공장 소개</span>
-                <textarea
+              <div className={cn(fieldClassName, 'sm:col-span-2')}>
+                <Label className={labelClassName}>공장 소개</Label>
+                <Textarea
                   rows={4}
                   {...registerBasic('description')}
                   className={textareaClassName}
                 />
-              </label>
-            </div>
-          </section>
-
-          <section className="mb-6 rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="mb-1 text-2xl font-bold text-ink-950">주요 공정</h2>
-            <p className="mb-6 text-base text-ink-700">
-              취급 가능한 뿌리공정을 선택하세요. 기타 공정은 직접 추가할 수 있습니다.
-            </p>
-
-            <div className="mb-6 flex flex-wrap gap-2">
-              {BASE_PROCESSES.map((process) => {
-                const isSelected = selectedProcesses.includes(process)
-
-                return (
-                  <button
-                    key={process}
-                    type="button"
-                    onClick={() => toggleProcess(process)}
-                    className={cn(
-                      'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition',
-                      isSelected
-                        ? 'border-brand bg-brand-light text-brand'
-                        : 'border-border bg-white text-ink-700 hover:border-brand-light',
-                    )}
-                  >
-                    {process}
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <input
-                value={customProcessInput}
-                onChange={(event) => setCustomProcessInput(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault()
-                    addCustomProcess()
-                  }
-                }}
-                placeholder="기타 공정 추가"
-                className={inputClassName}
-              />
-              <AppButton type="button" variant="secondary" size="lg" onClick={addCustomProcess}>
-                <Plus className="h-4 w-4" />
-                추가
-              </AppButton>
-            </div>
-
-            {customProcesses.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {customProcesses.map((process) => (
-                  <span
-                    key={process}
-                    className="inline-flex items-center gap-2 rounded-full border border-brand-light bg-brand-light px-4 py-2 text-sm font-semibold text-brand"
-                  >
-                    {process}
-                    <button
-                      type="button"
-                      onClick={() => removeCustomProcess(process)}
-                      className="rounded-full p-0.5 transition hover:bg-white"
-                      aria-label={`${process} 삭제`}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </span>
-                ))}
               </div>
-            )}
-          </section>
+            </CardContent>
+          </Card>
 
-          <section className="mb-6 rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="mb-1 text-2xl font-bold text-ink-950">설비 및 인증</h2>
-            <p className="mb-6 text-base text-ink-700">
-              보유 설비와 인증 정보를 쉼표로 구분해 입력하세요.
-            </p>
-
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <label>
-                <span className={labelClassName}>설비</span>
-                <input
-                  value={equipment}
-                  onChange={(event) => setEquipment(event.target.value)}
-                  placeholder="CNC 5축, 레이저 커팅기, 도장 부스"
-                  className={inputClassName}
-                />
-              </label>
-
-              <label>
-                <span className={labelClassName}>인증/자격</span>
-                <input
-                  value={certifications}
-                  onChange={(event) => setCertifications(event.target.value)}
-                  placeholder="ISO 9001, 뿌리기업 확인서"
-                  className={inputClassName}
-                />
-              </label>
-            </div>
-          </section>
-
-          <section className="mb-6 rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="mb-1 text-2xl font-bold text-ink-950">제품별 생산 가능량</h2>
-            <p className="mb-6 text-base text-ink-700">
-              주요 품목별 월 생산 가능량을 입력해 발주처가 양산 규모를 판단하게 도와주세요.
-            </p>
-
-            <div className="space-y-3">
-              {productionItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_1fr_auto]"
-                >
-                  <label>
-                    <span className={labelClassName}>제품명</span>
-                    <input
-                      value={item.productName}
-                      onChange={(event) =>
-                        updateProductionItem(item.id, 'productName', event.target.value)
-                      }
-                      className={inputClassName}
-                    />
-                  </label>
-                  <label>
-                    <span className={labelClassName}>월 생산 가능량</span>
-                    <input
-                      value={item.monthlyCapacity}
-                      onChange={(event) =>
-                        updateProductionItem(item.id, 'monthlyCapacity', event.target.value)
-                      }
-                      className={inputClassName}
-                    />
-                  </label>
-                  <label>
-                    <span className={labelClassName}>비고</span>
-                    <input
-                      value={item.notes}
-                      onChange={(event) =>
-                        updateProductionItem(item.id, 'notes', event.target.value)
-                      }
-                      className={inputClassName}
-                    />
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => removeProductionItem(item.id)}
-                    className="mt-7 inline-flex h-12 items-center justify-center rounded-xl border border-border px-4 text-ink-700 transition hover:border-red-200 hover:bg-red-50 hover:text-danger"
-                    aria-label={`${item.id} 행 삭제`}
+          <Card className={cardClassName}>
+            <CardHeader>
+              <CardTitle className="text-kr-pretty text-[18px] font-bold">주요 공정</CardTitle>
+              <CardDescription className="text-kr-pretty text-[15px]">
+                취급 가능한 뿌리공정을 선택하세요. 기타 공정은 직접 추가할 수 있습니다.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <ToggleGroup
+                type="multiple"
+                value={selectedProcesses}
+                onValueChange={setSelectedProcesses}
+                className="grid grid-cols-2 gap-2 sm:grid-cols-3"
+              >
+                {BASE_PROCESSES.map((process) => (
+                  <ToggleGroupItem
+                    key={process}
+                    value={process}
+                    className="text-kr-keep h-10 rounded-lg border border-input bg-card text-[15px] font-semibold data-[state=on]:border-primary data-[state=on]:bg-accent data-[state=on]:text-primary"
                   >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
+                    {process}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Input
+                  value={customProcessInput}
+                  onChange={(event) => setCustomProcessInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault()
+                      addCustomProcess()
+                    }
+                  }}
+                  placeholder="기타 공정 추가"
+                  className={inputClassName}
+                />
+                <AppButton type="button" variant="secondary" size="lg" onClick={addCustomProcess}>
+                  <Plus className="h-4 w-4" />
+                  추가
+                </AppButton>
+              </div>
+
+              {customProcesses.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {customProcesses.map((process) => (
+                    <span
+                      key={process}
+                      className="text-kr-keep inline-flex items-center gap-2 rounded-full border border-primary/20 bg-accent px-4 py-2 text-[15px] font-semibold text-primary"
+                    >
+                      {process}
+                      <button
+                        type="button"
+                        onClick={() => removeCustomProcess(process)}
+                        className="rounded-full p-0.5 transition hover:bg-card"
+                        aria-label={`${process} 삭제`}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </span>
+                  ))}
                 </div>
-              ))}
-            </div>
+              )}
+            </CardContent>
+          </Card>
 
-            <AppButton
-              type="button"
-              variant="secondary"
-              className="mt-5"
-              onClick={addProductionItem}
-            >
-              <Plus className="h-4 w-4" />행 추가
-            </AppButton>
-          </section>
+          <Card className={cardClassName}>
+            <CardHeader>
+              <CardTitle className="text-kr-pretty text-[18px] font-bold">설비 및 인증</CardTitle>
+              <CardDescription className="text-kr-pretty text-[15px]">
+                보유 설비와 인증 정보를 쉼표로 구분해 입력하세요.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className={fieldClassName}>
+                  <Label className={labelClassName}>설비</Label>
+                  <Input
+                    value={equipment}
+                    onChange={(event) => setEquipment(event.target.value)}
+                    placeholder="CNC 5축, 레이저 커팅기, 도장 부스"
+                    className={inputClassName}
+                  />
+                </div>
 
-          <section className="mb-6 rounded-2xl border border-border bg-white p-6 shadow-sm sm:p-8">
-            <div className="mb-6 flex items-start gap-3">
-              <div className="rounded-xl bg-brand-light p-3 text-brand">
-                <Camera className="h-5 w-5" />
+                <div className={fieldClassName}>
+                  <Label className={labelClassName}>인증/자격</Label>
+                  <Input
+                    value={certifications}
+                    onChange={(event) => setCertifications(event.target.value)}
+                    placeholder="ISO 9001, 뿌리기업 확인서"
+                    className={inputClassName}
+                  />
+                </div>
               </div>
-              <div>
-                <h2 className="mb-1 text-2xl font-bold text-ink-950">포트폴리오 이미지</h2>
-                <p className="text-base text-ink-700">
-                  설비, 생산품, 작업 현장 이미지를 추가해 공장 역량을 시각적으로 보여주세요.
-                </p>
-              </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-              id="portfolio-files"
-            />
-            <label
-              htmlFor="portfolio-files"
-              className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-surface-muted px-6 py-10 text-center transition hover:border-brand-light hover:bg-brand-light/30"
-            >
-              <Upload className="mb-3 h-8 w-8 text-brand" />
-              <span className="text-base font-bold text-ink-950">이미지 추가</span>
-              <span className="mt-1 text-sm text-ink-700">
-                여기에 이미지를 드래그하거나 클릭해서 선택
-              </span>
-            </label>
-
-            {portfolioImages.length > 0 && (
-              <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {portfolioImages.map((image) => (
-                  <figure
-                    key={image.id}
-                    className="group relative overflow-hidden rounded-2xl border border-border bg-surface-muted"
+          <Card className={cardClassName}>
+            <CardHeader>
+              <CardTitle className="text-kr-pretty text-[18px] font-bold">
+                제품별 생산 가능량
+              </CardTitle>
+              <CardDescription className="text-kr-pretty text-[15px]">
+                주요 품목별 월 생산 가능량을 입력해 발주처가 양산 규모를 판단하게 도와주세요.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {productionItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="grid grid-cols-1 gap-4 rounded-xl border border-border bg-muted/40 p-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]"
                   >
-                    <img src={image.url} alt={image.name} className="h-36 w-full object-cover" />
-                    <button
+                    <div className={fieldClassName}>
+                      <Label className={labelClassName}>제품명</Label>
+                      <Input
+                        value={item.productName}
+                        onChange={(event) =>
+                          updateProductionItem(item.id, 'productName', event.target.value)
+                        }
+                        className={inputClassName}
+                      />
+                    </div>
+                    <div className={fieldClassName}>
+                      <Label className={labelClassName}>월 생산 가능량</Label>
+                      <Input
+                        value={item.monthlyCapacity}
+                        onChange={(event) =>
+                          updateProductionItem(item.id, 'monthlyCapacity', event.target.value)
+                        }
+                        className={inputClassName}
+                      />
+                    </div>
+                    <div className={fieldClassName}>
+                      <Label className={labelClassName}>비고</Label>
+                      <Input
+                        value={item.notes}
+                        onChange={(event) =>
+                          updateProductionItem(item.id, 'notes', event.target.value)
+                        }
+                        className={inputClassName}
+                      />
+                    </div>
+                    <Button
                       type="button"
-                      onClick={() => removePortfolioImage(image.id)}
-                      className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink-950/70 text-white opacity-100 transition hover:bg-danger md:opacity-0 md:group-hover:opacity-100"
-                      aria-label={`${image.name} 삭제`}
+                      variant="outline"
+                      size="icon-lg"
+                      onClick={() => removeProductionItem(item.id)}
+                      className="mt-0 text-muted-foreground hover:text-destructive lg:mt-6"
+                      aria-label={`${item.id} 행 삭제`}
                     >
-                      <X className="h-4 w-4" />
-                    </button>
-                    <figcaption className="truncate px-3 py-2 text-xs font-semibold text-ink-700">
-                      {image.name}
-                    </figcaption>
-                  </figure>
+                      <Trash2 className="h-5 w-5" />
+                    </Button>
+                  </div>
                 ))}
               </div>
-            )}
-          </section>
 
-          <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+              <AppButton
+                type="button"
+                variant="secondary"
+                className="mt-5"
+                onClick={addProductionItem}
+              >
+                <Plus className="h-4 w-4" />행 추가
+              </AppButton>
+            </CardContent>
+          </Card>
+
+          <Card className={cardClassName}>
+            <CardHeader>
+              <div className="flex items-start gap-3">
+                <div className="rounded-xl bg-brand-light p-3 text-brand">
+                  <Camera className="h-5 w-5" />
+                </div>
+                <div>
+                  <CardTitle className="text-kr-pretty text-[18px] font-bold">
+                    포트폴리오 이미지
+                  </CardTitle>
+                  <CardDescription className="text-kr-pretty text-[15px]">
+                    설비, 생산품, 작업 현장 이미지를 추가해 공장 역량을 시각적으로 보여주세요.
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+                id="portfolio-files"
+              />
+              <Label
+                htmlFor="portfolio-files"
+                className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted px-6 py-10 text-center transition hover:border-primary/30 hover:bg-accent"
+              >
+                <Upload className="mb-3 h-8 w-8 text-primary" />
+                <span className="text-kr-keep text-base font-bold text-foreground">
+                  이미지 추가
+                </span>
+                <span className="text-kr-pretty mt-1 text-[15px] text-muted-foreground">
+                  여기에 이미지를 드래그하거나 클릭해서 선택
+                </span>
+              </Label>
+
+              {portfolioImages.length > 0 && (
+                <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                  {portfolioImages.map((image) => (
+                    <figure
+                      key={image.id}
+                      className="group relative overflow-hidden rounded-xl border border-border bg-muted"
+                    >
+                      <img src={image.url} alt={image.name} className="h-36 w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removePortfolioImage(image.id)}
+                        className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink-950/70 text-white opacity-100 transition hover:bg-danger md:opacity-0 md:group-hover:opacity-100"
+                        aria-label={`${image.name} 삭제`}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                      <figcaption className="text-anywhere truncate px-3 py-2 text-xs font-semibold text-foreground">
+                        {image.name}
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <div className="rounded-xl border border-border bg-card p-5 shadow-ct-soft">
             <AppButton type="submit" size="lg" fullWidth>
               공장 프로필 저장
             </AppButton>

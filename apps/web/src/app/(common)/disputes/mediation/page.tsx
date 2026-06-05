@@ -16,6 +16,12 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { AppBadge } from '@/components/ui/AppBadge'
 import { AppButton } from '@/components/ui/AppButton'
+import { Card, CardContent } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/cn'
 
 const disputeMediationSchema = z.object({
@@ -54,11 +60,10 @@ const evidenceOptions = [
   '기타 증빙',
 ]
 
-const inputClassName =
-  'h-14 w-full rounded-xl border border-slate-300 bg-surface px-4 text-lg text-ink-950 outline-none transition placeholder:text-ink-400 focus:border-brand focus:ring-4 focus:ring-brand-light'
-const labelClassName = 'mb-2 block text-sm font-semibold text-ink-700'
-const errorClassName = 'mt-1 text-sm text-danger'
-const sectionClassName = 'rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8'
+const inputClassName = 'h-11 bg-card text-[15px]'
+const labelClassName = 'text-kr-keep text-[16px] font-semibold text-foreground'
+const errorClassName = 'mt-1 text-[15px] font-semibold text-destructive'
+const sectionClassName = 'border-border bg-card shadow-ct-soft'
 
 export default function DisputeMediationPage() {
   return (
@@ -142,206 +147,227 @@ function DisputeMediationForm() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-muted px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
-        <header className="mb-8 rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8">
+    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mx-auto max-w-4xl">
+        <header className="mb-6 rounded-xl border border-border bg-card p-5 shadow-ct-soft sm:p-6">
           <AppBadge variant="amber" className="mb-4 px-4 py-2 text-sm font-semibold">
             <AlertTriangle className="h-4 w-4" />
             분쟁 중재 신청
           </AppBadge>
-          <h1 className="text-3xl font-bold tracking-normal text-ink-950 sm:text-4xl">
+          <h1 className="text-kr-pretty text-[24px] font-bold tracking-normal text-foreground sm:text-[28px]">
             분쟁 중재 신청
           </h1>
-          <p className="mt-3 text-lg leading-8 text-ink-700">
+          <p className="text-kr-pretty mt-2 text-[15px] leading-7 text-muted-foreground">
             거래에 문제가 발생했나요? 중재팀이 신속하게 검토해드립니다.
           </p>
         </header>
 
         <form onSubmit={handleSubmit(submitDisputeMediation)} className="space-y-6">
-          <section className={sectionClassName}>
-            <SectionHeader title="분쟁 유형" description="발생한 문제 유형을 선택하세요." />
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {disputeTypeOptions.map((option) => {
-                const Icon = option.icon
-                const isSelected = selectedDisputeType === option.value
+          <Card className={sectionClassName}>
+            <CardContent className="p-5 sm:p-6">
+              <SectionHeader title="분쟁 유형" description="발생한 문제 유형을 선택하세요." />
+              <ToggleGroup
+                type="single"
+                value={selectedDisputeType}
+                onValueChange={(value) => value && selectDisputeType(value as DisputeType)}
+                className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+              >
+                {disputeTypeOptions.map((option) => {
+                  const Icon = option.icon
 
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => selectDisputeType(option.value)}
-                    className={cn(
-                      'flex cursor-pointer items-start gap-3 rounded-2xl border-2 p-5 text-left transition',
-                      isSelected
-                        ? 'border-brand bg-brand-light/30'
-                        : 'border-border hover:border-brand-light',
-                    )}
-                  >
-                    <Icon className={cn('mt-0.5 h-6 w-6 shrink-0', option.iconClassName)} />
-                    <span className="text-lg font-bold text-ink-950">{option.label}</span>
-                  </button>
-                )
-              })}
-            </div>
-            {errors.disputeType && <p className={errorClassName}>{errors.disputeType.message}</p>}
-          </section>
-
-          <section className={sectionClassName}>
-            <SectionHeader title="거래 정보" />
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              <div>
-                <label htmlFor="transactionId" className={labelClassName}>
-                  거래 ID
-                </label>
-                <input
-                  id="transactionId"
-                  type="text"
-                  className={inputClassName}
-                  {...register('transactionId')}
-                />
-                {errors.transactionId && (
-                  <p className={errorClassName}>{errors.transactionId.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="counterparty" className={labelClassName}>
-                  거래 상대방
-                </label>
-                <input
-                  id="counterparty"
-                  type="text"
-                  className={inputClassName}
-                  {...register('counterparty')}
-                />
-                {errors.counterparty && (
-                  <p className={errorClassName}>{errors.counterparty.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="projectName" className={labelClassName}>
-                  프로젝트명
-                </label>
-                <input
-                  id="projectName"
-                  type="text"
-                  placeholder="예: 알루미늄 하우징 시제품"
-                  className={inputClassName}
-                  {...register('projectName')}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="amount" className={labelClassName}>
-                  거래 금액
-                </label>
-                <input
-                  id="amount"
-                  type="text"
-                  placeholder="예: 4,200,000원"
-                  className={inputClassName}
-                  {...register('amount')}
-                />
-                {errors.amount && <p className={errorClassName}>{errors.amount.message}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="contractDate" className={labelClassName}>
-                  계약 일자
-                </label>
-                <input
-                  id="contractDate"
-                  type="text"
-                  placeholder="예: 2026.04.28"
-                  className={inputClassName}
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className={sectionClassName}>
-            <SectionHeader
-              title="증빙 자료"
-              description="관련 자료를 체크하고 파일을 첨부하세요."
-            />
-            <div className="space-y-3">
-              {evidenceOptions.map((item) => (
-                <label key={item} className="flex cursor-pointer items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={evidenceItems.includes(item)}
-                    onChange={(event) => toggleEvidenceItem(item, event.target.checked)}
-                    className="h-5 w-5 rounded border-slate-300 accent-brand"
-                  />
-                  <span className="text-base font-semibold text-ink-700">{item}</span>
-                </label>
-              ))}
-            </div>
-            {errors.evidenceItems && (
-              <p className={errorClassName}>{errors.evidenceItems.message}</p>
-            )}
-
-            <div className="mt-6">
-              <label htmlFor="evidenceFileNames" className={labelClassName}>
-                파일 첨부
-              </label>
-              <input
-                id="evidenceFileNames"
-                type="file"
-                multiple
-                onChange={addEvidenceFiles}
-                className="block w-full cursor-pointer rounded-xl border border-dashed border-border bg-surface-muted px-4 py-4 text-sm font-semibold text-ink-700 file:mr-4 file:rounded-lg file:border-0 file:bg-brand file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:border-brand-light"
-              />
-              <p className="mt-2 text-sm text-ink-400">여기에 파일을 첨부하세요.</p>
-
-              {evidenceFileNames.length > 0 && (
-                <ul className="mt-4 space-y-2">
-                  {evidenceFileNames.map((fileName, index) => (
-                    <li
-                      key={`${fileName}-${index}`}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-muted p-3"
+                  return (
+                    <ToggleGroupItem
+                      key={option.value}
+                      value={option.value}
+                      className="h-auto justify-start rounded-xl border border-input bg-card p-4 text-left data-[state=on]:border-primary data-[state=on]:bg-accent"
                     >
-                      <div className="flex min-w-0 items-center gap-3">
-                        <FileText className="h-5 w-5 shrink-0 text-brand" />
-                        <span className="truncate text-sm font-semibold text-ink-700">
-                          {fileName}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeEvidenceFile(index)}
-                        className="rounded-full p-1 text-ink-400 transition hover:bg-border hover:text-ink-700"
-                        aria-label={`${fileName} 삭제`}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                      <Icon className={cn('mt-0.5 h-6 w-6 shrink-0', option.iconClassName)} />
+                      <span className="text-kr-keep text-[15px] font-bold text-foreground">
+                        {option.label}
+                      </span>
+                    </ToggleGroupItem>
+                  )
+                })}
+              </ToggleGroup>
+              {errors.disputeType && <p className={errorClassName}>{errors.disputeType.message}</p>}
+            </CardContent>
+          </Card>
+
+          <Card className={sectionClassName}>
+            <CardContent className="p-5 sm:p-6">
+              <SectionHeader title="거래 정보" />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="transactionId" className={labelClassName}>
+                    거래 ID
+                  </Label>
+                  <Input
+                    id="transactionId"
+                    type="text"
+                    className={inputClassName}
+                    {...register('transactionId')}
+                  />
+                  {errors.transactionId && (
+                    <p className={errorClassName}>{errors.transactionId.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="counterparty" className={labelClassName}>
+                    거래 상대방
+                  </Label>
+                  <Input
+                    id="counterparty"
+                    type="text"
+                    className={inputClassName}
+                    {...register('counterparty')}
+                  />
+                  {errors.counterparty && (
+                    <p className={errorClassName}>{errors.counterparty.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="projectName" className={labelClassName}>
+                    프로젝트명
+                  </Label>
+                  <Input
+                    id="projectName"
+                    type="text"
+                    placeholder="예: 알루미늄 하우징 시제품"
+                    className={inputClassName}
+                    {...register('projectName')}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="amount" className={labelClassName}>
+                    거래 금액
+                  </Label>
+                  <Input
+                    id="amount"
+                    type="text"
+                    placeholder="예: 4,200,000원"
+                    className={inputClassName}
+                    {...register('amount')}
+                  />
+                  {errors.amount && <p className={errorClassName}>{errors.amount.message}</p>}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="contractDate" className={labelClassName}>
+                    계약 일자
+                  </Label>
+                  <Input
+                    id="contractDate"
+                    type="text"
+                    placeholder="예: 2026.04.28"
+                    className={inputClassName}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className={sectionClassName}>
+            <CardContent className="p-5 sm:p-6">
+              <SectionHeader
+                title="증빙 자료"
+                description="관련 자료를 체크하고 파일을 첨부하세요."
+              />
+              <div className="space-y-3">
+                {evidenceOptions.map((item) => (
+                  <Label
+                    key={item}
+                    className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2.5"
+                  >
+                    <Checkbox
+                      checked={evidenceItems.includes(item)}
+                      onCheckedChange={(checked) => toggleEvidenceItem(item, Boolean(checked))}
+                    />
+                    <span className="text-kr-keep text-[16px] font-semibold text-foreground">
+                      {item}
+                    </span>
+                  </Label>
+                ))}
+              </div>
+              {errors.evidenceItems && (
+                <p className={errorClassName}>{errors.evidenceItems.message}</p>
               )}
-            </div>
-          </section>
 
-          <section className={sectionClassName}>
-            <SectionHeader title="요청 해결안" />
-            <textarea
-              id="requestedResolution"
-              rows={5}
-              placeholder="원하는 해결 방향을 구체적으로 작성해주세요 (10자 이상)..."
-              className="w-full resize-none rounded-xl border border-slate-300 bg-surface px-4 py-3 text-lg text-ink-950 outline-none transition placeholder:text-ink-400 focus:border-brand focus:ring-4 focus:ring-brand-light"
-              {...register('requestedResolution')}
-            />
-            {errors.requestedResolution && (
-              <p className={errorClassName}>{errors.requestedResolution.message}</p>
-            )}
-          </section>
+              <div className="mt-6">
+                <Label htmlFor="evidenceFileNames" className={labelClassName}>
+                  파일 첨부
+                </Label>
+                <input
+                  id="evidenceFileNames"
+                  type="file"
+                  multiple
+                  onChange={addEvidenceFiles}
+                  className="block w-full cursor-pointer rounded-xl border border-dashed border-border bg-muted px-4 py-4 text-sm font-semibold text-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-bold file:text-primary-foreground hover:border-primary/30"
+                />
+                <p className="text-kr-pretty mt-2 text-[15px] text-muted-foreground">
+                  여기에 파일을 첨부하세요.
+                </p>
 
-          <section className={sectionClassName}>
-            <AppButton type="submit" variant="primary" size="lg" fullWidth disabled={isSubmitting}>
-              분쟁 중재 신청
-            </AppButton>
-          </section>
+                {evidenceFileNames.length > 0 && (
+                  <ul className="mt-4 space-y-2">
+                    {evidenceFileNames.map((fileName, index) => (
+                      <li
+                        key={`${fileName}-${index}`}
+                        className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted p-3"
+                      >
+                        <div className="flex min-w-0 items-center gap-3">
+                          <FileText className="h-5 w-5 shrink-0 text-primary" />
+                          <span className="text-anywhere truncate text-sm font-semibold text-foreground">
+                            {fileName}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeEvidenceFile(index)}
+                          className="rounded-full p-1 text-muted-foreground transition hover:bg-border hover:text-foreground"
+                          aria-label={`${fileName} 삭제`}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className={sectionClassName}>
+            <CardContent className="p-5 sm:p-6">
+              <SectionHeader title="요청 해결안" />
+              <Textarea
+                id="requestedResolution"
+                rows={5}
+                placeholder="원하는 해결 방향을 구체적으로 작성해주세요 (10자 이상)..."
+                className="resize-none text-[15px]"
+                {...register('requestedResolution')}
+              />
+              {errors.requestedResolution && (
+                <p className={errorClassName}>{errors.requestedResolution.message}</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className={sectionClassName}>
+            <CardContent className="p-5 sm:p-6">
+              <AppButton
+                type="submit"
+                variant="primary"
+                size="lg"
+                fullWidth
+                disabled={isSubmitting}
+              >
+                분쟁 중재 신청
+              </AppButton>
+            </CardContent>
+          </Card>
         </form>
       </div>
     </div>
@@ -350,23 +376,23 @@ function DisputeMediationForm() {
 
 function DisputeMediationShell() {
   return (
-    <div className="min-h-screen bg-surface-muted px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
-        <header className="mb-8 rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8">
+    <div className="min-h-screen bg-background px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mx-auto max-w-4xl">
+        <header className="mb-6 rounded-xl border border-border bg-card p-5 shadow-ct-soft sm:p-6">
           <AppBadge variant="amber" className="mb-4 px-4 py-2 text-sm font-semibold">
             <AlertTriangle className="h-4 w-4" />
             분쟁 중재 신청
           </AppBadge>
-          <h1 className="text-3xl font-bold tracking-normal text-ink-950 sm:text-4xl">
+          <h1 className="text-kr-pretty text-[24px] font-bold tracking-normal text-foreground sm:text-[28px]">
             분쟁 중재 신청
           </h1>
-          <p className="mt-3 text-lg leading-8 text-ink-700">
+          <p className="text-kr-pretty mt-2 text-[15px] leading-7 text-muted-foreground">
             거래에 문제가 발생했나요? 중재팀이 신속하게 검토해드립니다.
           </p>
         </header>
 
-        <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm sm:p-8">
-          <p className="text-base font-semibold text-ink-700">
+        <div className="rounded-xl border border-border bg-card p-6 shadow-ct-soft sm:p-8">
+          <p className="text-kr-pretty text-base font-semibold text-muted-foreground">
             분쟁 중재 신청 양식을 불러오는 중입니다.
           </p>
         </div>
@@ -378,8 +404,14 @@ function DisputeMediationShell() {
 function SectionHeader({ title, description }: { title: string; description?: string }) {
   return (
     <div className="mb-5">
-      <h2 className="text-2xl font-bold text-ink-950">{title}</h2>
-      {description && <p className="mt-2 text-base leading-7 text-ink-700">{description}</p>}
+      <h2 className="text-kr-pretty text-[18px] font-bold text-foreground sm:text-[20px]">
+        {title}
+      </h2>
+      {description && (
+        <p className="text-kr-pretty mt-2 text-[15px] leading-6 text-muted-foreground">
+          {description}
+        </p>
+      )}
     </div>
   )
 }

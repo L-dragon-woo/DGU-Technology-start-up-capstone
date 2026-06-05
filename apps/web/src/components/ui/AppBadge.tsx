@@ -1,42 +1,37 @@
 import type { ReactNode } from 'react'
-import { cn } from '@/lib/cn'
+import { Badge } from '@/components/ui/badge'
+import type { BadgeProps as ShadcnBadgeProps } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
-type BadgeVariant = 'blue' | 'green' | 'yellow' | 'amber' | 'red' | 'slate'
-type BadgeSize = 'sm' | 'md' | 'lg'
+type LegacyVariant = 'blue' | 'green' | 'yellow' | 'amber' | 'red' | 'slate'
+type LegacySize = 'sm' | 'md' | 'lg'
 
-const variantStyles: Record<BadgeVariant, string> = {
-  blue: 'bg-brand-light text-brand',
-  green: 'bg-success-bg text-success',
-  yellow: 'bg-warning-bg text-warning-text',
-  amber: 'bg-warning-bg text-warning-text',
-  red: 'bg-danger-bg text-danger',
-  slate: 'bg-surface-muted text-ink-800',
+const variantMap: Record<LegacyVariant, ShadcnBadgeProps['variant']> = {
+  blue: 'info',
+  green: 'success',
+  yellow: 'warning',
+  amber: 'warning',
+  red: 'destructive',
+  slate: 'slate',
 }
 
-const sizeStyles: Record<BadgeSize, string> = {
-  sm: 'px-2.5 py-1 text-sm',
-  md: 'px-3 py-1.5 text-sm',
-  lg: 'px-3.5 py-2 text-base',
+const sizeMap: Record<LegacySize, ShadcnBadgeProps['size']> = {
+  sm: 'sm',
+  md: 'default',
+  lg: 'lg',
 }
 
 interface AppBadgeProps {
-  variant?: BadgeVariant
-  size?: BadgeSize
+  variant?: LegacyVariant
+  size?: LegacySize
   children: ReactNode
   className?: string
 }
 
 export function AppBadge({ variant = 'blue', size = 'md', children, className }: AppBadgeProps) {
   return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-pill font-semibold leading-none',
-        sizeStyles[size],
-        variantStyles[variant],
-        className,
-      )}
-    >
+    <Badge variant={variantMap[variant]} size={sizeMap[size]} className={cn(className)}>
       {children}
-    </span>
+    </Badge>
   )
 }

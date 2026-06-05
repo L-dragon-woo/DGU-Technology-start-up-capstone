@@ -1,1 +1,3 @@
 pnpm lint-staged
+pnpm guard:no-card-stripes
+pnpm guard:senior-ux
